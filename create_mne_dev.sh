@@ -22,10 +22,10 @@ echo "setting PyCharm-Path to: $pycharm_path"
 solver=mamba
 
 # Install mamba
-if [ $solver = mamba]
+if [ $solver = mamba ]
 then
     echo "Installing mamba"
-    conda install --channel=conda-forge --name=base mamba
+    conda install --yes --channel=conda-forge --name=base mamba
 fi
 
 # Remove existing environment

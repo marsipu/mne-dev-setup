@@ -11,7 +11,7 @@ set solver=mamba
 :: Install mamba
 if %solver%==mamba (
     echo "Installing mamba"
-    conda install --channel=conda-forge --name=base mamba
+    conda install --yes --channel=conda-forge --name=base mamba
 )
 
 :: Remove existing environment

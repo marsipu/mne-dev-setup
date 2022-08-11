@@ -9,7 +9,7 @@ solver=mamba
 if [ $solver = mamba]
 then
     echo "Installing mamba"
-    conda install --channel=conda-forge --name=base mamba
+    conda install --yes --channel=conda-forge --name=base mamba
 fi
 
 # Get environment name
