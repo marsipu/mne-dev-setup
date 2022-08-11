@@ -1,12 +1,13 @@
 #!/bin/bash
 # This batch file creates a mne-environment
+# It has to be run with bash -i to source .bashrc
 echo "Creating MNE-Environment"
 
 # Use mamba or conda?
 solver=mamba
 
 # Install mamba
-if [ $solver = mamba]
+if [ $solver = mamba ]
 then
     echo "Installing mamba"
     conda install --yes --channel=conda-forge --name=base mamba

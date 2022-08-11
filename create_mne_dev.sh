@@ -1,5 +1,6 @@
 #!/bin/bash
 # This batch file creates a mne-environment
+# It has to be run with bash -i to source .bashrc
 echo "Creating MNE-Dev-Environment"
 wsl_path="/mnt/c/users/marti/PycharmProjects"
 lab_linux_path="/home/martins/PycharmProjects"
@@ -7,7 +8,6 @@ lab_linux_path="/home/martins/PycharmProjects"
 if [[ -d $wsl_path ]]
 then
     pycharm_path=$wsl_path
-    conda init bash
 elif [[ -d $lab_linux_path ]]
 then
     pycharm_path=$lab_linux_path
