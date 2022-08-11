@@ -19,7 +19,7 @@ fi
 echo "setting PyCharm-Path to: $pycharm_path" 
 
 # Use mamba or conda?
-solver=conda
+solver=mamba
 
 # Install mamba
 if [ $solver = mamba]

@@ -6,7 +6,7 @@ set root=C:/Users/marti/anaconda3
 call %root%/Scripts/activate.bat %root%
 
 :: Use mamba or conda?
-set solver=conda
+set solver=mamba
 
 :: Install mamba
 if %solver%==mamba (
