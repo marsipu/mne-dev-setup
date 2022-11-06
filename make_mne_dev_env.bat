@@ -20,7 +20,7 @@ call conda env remove -n mnedev
 rmdir /s /q "C:/Users/marti/anaconda3/envs/mnedev"
 
 echo "Installing mne"
-call curl --remote-name https://raw.githubusercontent.com/mne-tools/mne-python/master/environment.yml
+call curl --remote-name --ssl-no-revoke https://raw.githubusercontent.com/mne-tools/mne-python/main/environment.yml
 call %solver% env create -n mnedev -f environment.yml
 call conda activate mnedev
 call mne sys_info
