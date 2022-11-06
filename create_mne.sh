@@ -4,7 +4,7 @@
 echo "Creating MNE-Environment"
 
 # Use mamba or conda?
-solver=mamba
+solver=conda
 
 # Install mamba
 if [ $solver = mamba ]
