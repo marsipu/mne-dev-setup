@@ -16,7 +16,7 @@ if %_solver%==y (
 :: Install mamba
 if %solver%==mamba (
     echo "Installing mamba"
-    conda install --yes --channel=conda-forge --name=base mamba
+    call conda install --yes --channel=conda-forge --name=base mamba
 )
 
 :: Get environment name
