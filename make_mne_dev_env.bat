@@ -2,11 +2,16 @@
 @echo off
 echo "Creating MNE-Dev-Environment"
 :: Activate Anaconda
-set root=C:/Users/marti/anaconda3
+set root=C:/Users/martin/anaconda3
 call %root%/Scripts/activate.bat %root%
 
 :: Use mamba or conda?
-set solver=conda
+set /P _solver="Do you want to use mamba? (y/n): "
+if %_solver%==y (
+    set solver=mamba
+) else (
+    set solver=conda
+)
 
 :: Install mamba
 if %solver%==mamba (
@@ -29,7 +34,7 @@ call del "environment.yml"
 
 echo "Installing mne dependencies"
 :: Activate mne-python development-version
-cd /d "C:/Users/marti/PycharmProjects/mne-python"
+cd /d "C:/Users/martin/PycharmProjects/mne-python"
 call python -m pip uninstall -y mne
 call pip install -e .
 call pip install -r requirements_doc.txt
@@ -37,11 +42,11 @@ call pip install -r requirements_testing.txt
 call pip install -r requirements_testing_extra.txt
 call %solver% install -y graphviz
 call %solver% install -c conda-forge -y sphinx-autobuild doc8
-cd /d "C:/Users/marti/PycharmProjects/mne-qt-browser"
+cd /d "C:/Users/martin/PycharmProjects/mne-qt-browser"
 call python -m pip uninstall -y mne_qt_browser
 call pip install -e .
 call pip install -r requirements_testing.txt
-cd /d "C:/Users/marti/PycharmProjects/mne-pipeline-hd"
+cd /d "C:/Users/martin/PycharmProjects/mne-pipeline-hd"
 call pip install -e .
 call pip install -r requirements_dev.txt
 

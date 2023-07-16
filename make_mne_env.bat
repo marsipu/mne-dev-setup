@@ -2,11 +2,16 @@
 @echo off
 echo "Creating MNE-Environment"
 :: Activate Anaconda
-set root=C:/Users/marti/anaconda3
+set root=C:/Users/martin/anaconda3
 call %root%/Scripts/activate.bat %root%
 
 :: Use mamba or conda?
-set solver=conda
+set /P _solver="Do you want to use mamba? (y/n): "
+if %_solver%==y (
+    set solver=mamba
+) else (
+    set solver=conda
+)
 
 :: Install mamba
 if %solver%==mamba (

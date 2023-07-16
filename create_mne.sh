@@ -4,7 +4,13 @@
 echo "Creating MNE-Environment"
 
 # Use mamba or conda?
-solver=conda
+read -p "Do you want to use mamba? [y/n]:" _solver
+if [ $_solver = y ]
+then
+    solver=mamba
+else
+    solver=conda
+fi
 
 # Install mamba
 if [ $solver = mamba ]
