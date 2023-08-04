@@ -49,16 +49,18 @@ rm ./environment.yml
 echo "Installing mne dependencies"
 cd "$pycharm_path/mne-python"
 python -m pip uninstall -y mne
-pip install -e .
+pip install -e . --config-settings editable_mode=strict
 pip install -r requirements_doc.txt
 pip install -r requirements_testing.txt
 pip install -r requirements_testing_extra.txt
 $solver install -y graphviz
 $solver install -c conda-forge -y sphinx-autobuild doc8
+
 cd "$pycharm_path/mne-qt-browser"
 python -m pip uninstall -y mne_qt_browser
-pip install -e .
+pip install -e . --config-settings editable_mode=strict
 pip install -r requirements_testing.txt
+
 cd "$pycharm_path/mne-pipeline-hd"
-pip install -e .
+pip install -e . --config-settings editable_mode=strict
 pip install -r requirements_dev.txt
