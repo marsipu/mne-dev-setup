@@ -46,6 +46,7 @@ mne sys_info
 
 rm ./environment.yml
 
+# Install dev-version of mne-python
 echo "Installing mne dependencies"
 cd "$pycharm_path/mne-python"
 python -m pip uninstall -y mne
@@ -55,12 +56,15 @@ pip install -r requirements_testing.txt
 pip install -r requirements_testing_extra.txt
 $solver install -y graphviz
 $solver install -c conda-forge -y sphinx-autobuild doc8
+pre-commit install
 
+# Install dev-version of mne-qt-browser
 cd "$pycharm_path/mne-qt-browser"
 python -m pip uninstall -y mne_qt_browser
 pip install -e . --config-settings editable_mode=strict
 pip install -r requirements_testing.txt
 
+# Install dev-version of mne-pipeline-hd
 cd "$pycharm_path/mne-pipeline-hd"
 pip install -e . --config-settings editable_mode=strict
 pip install -r requirements_dev.txt

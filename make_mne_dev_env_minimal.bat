@@ -20,15 +20,18 @@ call mne sys_info
 echo "Installing Qt"
 call pip install PyQt5
 echo "Installing mne dependencies"
-:: Activate mne-python development-version
+:: Install dev-version of mne-python
 cd /d "C:/Users/martin/PycharmProjects/mne-python"
 call python -m pip uninstall -y mne
 call pip install -e . --config-settings editable_mode=strict
 call pip install -r requirements_testing.txt
+call pre-commit install
+:: Install dev-version of mne-qt-browser
 cd /d "C:/Users/martin/PycharmProjects/mne-qt-browser"
 call python -m pip uninstall -y mne_qt_browser
 call pip install -e . --config-settings editable_mode=strict
 call pip install -r requirements_testing.txt
+:: Install dev-version of mne-pipeline-hd
 cd /d "C:/Users/martin/PycharmProjects/mne-pipeline-hd"
 call pip install -e . --config-settings editable_mode=strict
 call pip install -r requirements_dev.txt
