@@ -2,7 +2,7 @@
 @echo off
 echo "Creating MNE-Environment"
 :: Activate Anaconda
-set root=C:/Users/martin/anaconda3
+set root=C:/Users/marti/anaconda3
 call %root%/Scripts/activate.bat %root%
 
 :: Use mamba or conda?
