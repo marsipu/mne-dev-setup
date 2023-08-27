@@ -48,12 +48,10 @@ call pre-commit install
 :: Install dev-version of mne-qt-browser
 cd /d %script_root%/mne-qt-browser
 call python -m pip uninstall -y mne_qt_browser
-call pip install -e . --config-settings editable_mode=strict
-call pip install -r requirements_testing.txt
+call pip install -e .[tests] --config-settings editable_mode=strict
 :: Install dev-version of mne-pipeline-hd
-cd /d %script_root%/mne-pipeline-hdeuro
-call pip install -e . --config-settings editable_mode=strict
-call pip install -r requirements_dev.txt
+cd /d %script_root%/mne-pipeline-hd
+call pip install -e .[opengl,tests] --config-settings editable_mode=strict
 
 Pause
 exit
