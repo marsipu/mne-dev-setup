@@ -5,7 +5,7 @@ echo "Creating MNE-Dev-Environment"
 set root=C:/Users/martin
 set conda_root=%root%/anaconda3
 set script_root=%root%/PycharmProjects
-call %conda_root%/Scripts/activate.bat %root%
+call %conda_root%/Scripts/activate.bat %conda_root%
 
 :: Use mamba or conda?
 set /P _solver="Do you want to use mamba? (y/n): "
