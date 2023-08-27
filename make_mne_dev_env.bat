@@ -2,7 +2,7 @@
 @echo off
 echo "Creating MNE-Dev-Environment"
 :: Activate Anaconda
-set root=C:/Users/martin
+set root=C:/Users/marti
 set conda_root=%root%/anaconda3
 set script_root=%root%/PycharmProjects
 call %conda_root%/Scripts/activate.bat %root%
