@@ -10,6 +10,9 @@ jobs:
     name: '${{ matrix.os }} ${{ matrix.solver }} ${{ matrix.install_type }}'
     continue-on-error: false
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
     strategy:
       fail-fast: false
       matrix:
@@ -21,9 +24,9 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: latest
+          auto-activate-base: true
           use_mamba: ${{ matrix.solver == 'mamba' }}
       - name: 'Prepare variables'
-        shell: bash
         run: |
           # Create appropriate input for first solver-question
           if [ ${{ matrix.solver == 'mamba' }} ]; then
@@ -45,17 +48,22 @@ jobs:
           fi
 
           # Save input to environment variable
+          echo "These are the inputs: $inputs"
           echo "inputs=$inputs" >> "$GITHUB_ENV"
 
           # Save inputs to file for Windows
+          echo "This is the input-array: ${inputs_arr[@]}"
           if [${{ matrix.os == 'windows-latest' }}]; then
             printf '%s\n' "${inputs_arr[@]}" >> inputs.txt
           fi
   
       - name: 'Run installation script (Unix)'
         if: ${{ matrix.os != 'windows-latest' }}
-        run: echo -e $inputs | bash install_mne.sh
+        run: |
+          echo $inputs
+          echo -e $inputs | bash -i install_mne.sh
 
       - name: 'Run installation script (Windows)'
+        shell: cmd /C call {0}
         if: ${{ matrix.os == 'windows-latest' }}
         run: install_mne.bat < inputs.txt
