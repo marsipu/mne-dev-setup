@@ -50,6 +50,7 @@ jobs:
           # Save inputs to file for Windows
           if [${{ matrix.os == 'windows-latest' }}]; then
             printf '%s\n' "${inputs_arr[@]}" >> inputs.txt
+          fi
   
       - name: 'Run installation script (Unix)'
         if: ${{ matrix.os != 'windows-latest' }}
