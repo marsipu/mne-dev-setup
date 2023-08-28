@@ -2,7 +2,7 @@
 # This batch file creates a mne-environment
 # It has to be run with bash -i to source .bashrc
 echo "Creating MNE-Dev-Environment"
-root="C:/Users/martin"
+root="/Users/martinschulz"
 conda_root="$root/anaconda3"
 script_root="$root/PycharmProjects"
 
