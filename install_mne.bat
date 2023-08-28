@@ -10,8 +10,8 @@ setlocal enabledelayedexpansion
 for /f "tokens=1,2 delims==" %%a in (./version.txt) do (
     if %%a==version set version=%%b
 )
-
 echo Running mne-python installation script %version% for Windows...
+
 :: Read paths from paths.inis
 for /f "tokens=1,2 delims==" %%a in (./paths.ini) do (
     if %%a==conda_root set conda_root=%%b
@@ -20,7 +20,7 @@ for /f "tokens=1,2 delims==" %%a in (./paths.ini) do (
 echo Conda-Root: %conda_root%
 echo Script-Root: %script_root%
 
-:: Check if paths exist
+:: Check if all paths exist
 for %%a in (%conda_root%, %script_root%) do (
     if not exist %%a (
         echo Path %%a does not exist, exiting...
