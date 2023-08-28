@@ -58,11 +58,11 @@ if [ $_inst_type == n ]; then
 
 else
   # Remove existing environment
-  echo "Removing existing environment"
+  echo Removing existing environment
   conda env remove -n mnedev
   rm -rf "$conda_root/envs/mnedev"
 
-  echo "Installing development version of mne-python"
+  echo Installing development version of mne-python
   curl --remote-name --ssl-no-revoke https://raw.githubusercontent.com/mne-tools/mne-python/main/environment.yml
   $solver env create -n mnedev -f environment.yml
   conda activate mnedev
@@ -70,7 +70,7 @@ else
   # Delete environment.yml
   rm "environment.yml"
 
-  echo "Installing mne-python development dependencies..."
+  echo Installing mne-python development dependencies...
   # Install dev-version of mne-python
   cd "$script_root/mne-python" || exit
   python -m pip uninstall -y mne
@@ -82,13 +82,13 @@ else
   pre-commit install
 
   # Install dev-version of mne-qt-browser
-  echo "Installing developement version of mne-qt-browser"
+  echo Installing developement version of mne-qt-browser
   cd "$script_root/mne-qt-browser" || exit
   python -m pip uninstall -y mne_qt_browser
   pip install -e .[opengl,tests]
 
   # Install dev-version of mne-pipeline-hd
-  echo "Installing"
+  echo Installing
   cd "$script_root/mne-pipeline-hd" || exit
   pip install -e .[tests]
 fi
