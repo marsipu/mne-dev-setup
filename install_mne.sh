@@ -8,6 +8,8 @@ echo Running mne-python installation script $version for MacOs/Linux...
 
 # Read paths from paths.ini
 source ./paths.ini
+echo Conda-Root: $conda_root
+echo Script-Root: $script_root
 
 # :: Check if all paths exist
 paths=($root $conda_root $script_root)
