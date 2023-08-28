@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        solver: [conda, mamba]
+        solver: [conda]
         install_type: [dev, stable_full, stable_core]
     steps:
       - uses: actions/checkout@v3
