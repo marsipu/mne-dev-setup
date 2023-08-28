@@ -29,17 +29,17 @@ jobs:
       - name: 'Prepare variables'
         run: |
           # Create appropriate input for first solver-question
-          if [ ${{ matrix.solver == 'mamba' }} ]; then
+          if [ matrix.solver == 'mamba' ]; then
             first_input=y
           else
             first_input=n
           fi
 
           # Create appopriate input for remaining questions
-          if [ ${{ matrix.install_type == 'dev' }} ]; then
+          if [ matrix.install_type == 'dev' ]; then
             inputs="$first_input\ny\n"
             inputs_arr=( $first_input y )
-          elif [ ${{ matrix.install_type == 'stable_full' }} ]; then
+          elif [ matrix.install_type == 'stable_full' ]; then
             inputs="$first_input\nn\ntest\nn\n"
             inputs_arr=( $first_input n test n )
           else
@@ -53,17 +53,17 @@ jobs:
 
           # Save inputs to file for Windows
           echo "This is the input-array: ${inputs_arr[@]}"
-          if [${{ matrix.os == 'windows-latest' }}]; then
+          if [ matrix.os == 'windows-latest' ]; then
             printf '%s\n' "${inputs_arr[@]}" >> inputs.txt
           fi
   
       - name: 'Run installation script (Unix)'
-        if: ${{ matrix.os != 'windows-latest' }}
+        if: matrix.os != 'windows-latest'
         run: |
           echo $inputs
           echo -e $inputs | bash -i install_mne.sh
 
       - name: 'Run installation script (Windows)'
         shell: cmd /C call {0}
-        if: ${{ matrix.os == 'windows-latest' }}
+        if: matrix.os == 'windows-latest'
         run: install_mne.bat < inputs.txt
