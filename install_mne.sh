@@ -1,7 +1,6 @@
 #!/bin/bash
 # This batch file creates a mne-environment
 # It has to be run with bash -i to source .bashrc
-echo "Creating MNE-Dev-Environment"
 
 # Read version
 source ./version.txt
@@ -57,6 +56,7 @@ if [ $_inst_type == n ]; then
   conda activate $_env_name
 
 else
+  echo Creating development environment "mnedev"...
   # Remove existing environment
   echo Removing existing environment
   conda env remove -n mnedev

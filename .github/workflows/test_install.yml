@@ -1,0 +1,60 @@
+name: 'Test scripts'
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: '${{ matrix.os }} ${{ matrix.solver }} ${{ matrix.install_type }}'
+    continue-on-error: false
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        solver: [conda, mamba]
+        install_type: [dev, stable_full, stable_core]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: latest
+          use_mamba: ${{ matrix.solver == 'mamba' }}
+      - name: 'Prepare variables'
+        shell: bash
+        run: |
+          # Create appropriate input for first solver-question
+          if [ ${{ matrix.solver == 'mamba' }} ]; then
+            first_input = y
+          else
+            first_input = n
+          fi
+
+          # Create appopriate input for remaining questions
+          if [ ${{ matrix.install_type == 'dev' }} ]; then
+            inputs = "$first_input\ny\n"
+            inputs_arr = ( $first_input y )
+          elif [ ${{ matrix.install_type == 'stable_full' }} ]; then
+            inputs = "$first_input\nn\ntest\nn\n"
+            inputs_arr = ( $first_input n test n )
+          else
+            inputs = "$first_input\nn\ntest\ny\n"
+            inputs_arr = ( $first_input n test y )
+          fi
+
+          # Save input to environment variable
+          echo "inputs=$inputs" >> "$GITHUB_ENV"
+
+          # Save inputs to file for Windows
+          if [${{ matrix.os == 'windows-latest' }}]; then
+            printf '%s\n' "${inputs_arr[@]}" >> inputs.txt
+  
+      - name: 'Run installation script (Unix)'
+        if: ${{ matrix.os != 'windows-latest' }}
+        run: echo -e $inputs | bash install_mne.sh
+
+      - name: 'Run installation script (Windows)'
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: install_mne.bat < inputs.txt

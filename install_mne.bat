@@ -67,6 +67,7 @@ if %_inst_type%==n (
 
 ) else (
     :: Remove existing environment
+    echo Creating development environment "mnedev"...
     echo Removing existing environment
     call conda env remove -n mnedev
     rmdir /s /q %conda_root%/envs/mnedev
