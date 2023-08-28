@@ -1,10 +1,26 @@
 :: This batch file creates a mne-environment
 @echo off
 echo "Creating MNE-Dev-Environment"
+Pause
+:: Read paths
+for /f "tokens=1,2 delims==" %%a in (paths.ini) do (
+if %%a==conda_root set conda_root=%%b
+if %%a==script_root set script_root=%%b
+)
+echo "Conda-Root: %conda_root%"
+echo "Script-Root: %script_root%"
+
+:: Check if paths exist
+for %%a in (%conda_root%, %script_root%) do (
+    if not exist %%a (
+        echo "Path %%a does not exist"
+        Pause
+        exit
+    )
+)
+Pause
+
 :: Activate Anaconda
-set root=C:/Users/martin
-set conda_root=%root%/anaconda3
-set script_root=%root%/PycharmProjects
 call %conda_root%/Scripts/activate.bat %conda_root%
 
 :: Use mamba or conda?
