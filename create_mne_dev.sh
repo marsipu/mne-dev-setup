@@ -6,6 +6,17 @@ root="/Users/martinschulz"
 conda_root="$root/anaconda3"
 script_root="$root/PycharmProjects"
 
+# Check for path existence
+paths=($root $conda_root $script_root)
+for path in ${paths[@]};
+do
+    if [ ! -d $path ]
+    then
+        echo "Path $path does not exist"
+        exit 1
+    fi
+done
+
 # Use mamba or conda?
 read -p "Do you want to use mamba? [y/n]:" _solver
 if [ $_solver = y ]
