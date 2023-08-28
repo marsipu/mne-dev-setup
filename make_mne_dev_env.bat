@@ -2,8 +2,8 @@
 @echo off
 echo "Creating MNE-Dev-Environment"
 Pause
-:: Read paths
-for /f "tokens=1,2 delims==" %%a in (paths.ini) do (
+:: Read paths from paths.ini
+for /f "tokens=1,2 delims==" %%a in (./paths.ini) do (
 if %%a==conda_root set conda_root=%%b
 if %%a==script_root set script_root=%%b
 )

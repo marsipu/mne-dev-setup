@@ -2,9 +2,9 @@
 # This batch file creates a mne-environment
 # It has to be run with bash -i to source .bashrc
 echo "Creating MNE-Dev-Environment"
-root="/Users/martinschulz"
-conda_root="$root/anaconda3"
-script_root="$root/PycharmProjects"
+
+# Read paths from paths.ini
+source ./paths.ini
 
 # Check for path existence
 paths=($root $conda_root $script_root)
