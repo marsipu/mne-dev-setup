@@ -7,17 +7,31 @@ set conda_root=%root%/anaconda3
 set script_root=%root%/PycharmProjects
 call %conda_root%/Scripts/activate.bat %conda_root%
 
+:: Use mamba or conda?
+set /P _solver="Do you want to use mamba? (y/n): "
+if %_solver%==y (
+    set solver=mamba
+) else (
+    set solver=conda
+)
+
+:: Install mamba
+if %solver%==mamba (
+    echo "Installing mamba"
+    call conda install --yes --channel=conda-forge --name=base mamba
+)
+
 :: Remove existing environment
 echo "Removing existing environment"
 call conda env remove --name mnedev_minimal
 rmdir /s /q %conda_root%/envs/mnedev_minimal
 
 echo "Creating environment"
-call conda create --yes --name mnedev_minimal python
+call %solver% create --yes --name mnedev_minimal python
 call conda activate mnedev_minimal
 
 echo "Installing IPython"
-call conda install ipython
+call %solver% install ipython
 
 echo "Installing mne"
 call pip install mne

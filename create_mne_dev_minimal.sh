@@ -24,33 +24,35 @@ fi
 
 # Remove existing environment
 echo "Removing existing environment"
-conda env remove -n mnedev
+conda env remove -n mnedev_minimal
+
+echo "Creating environment"
+$solver create --yes --name mnedev_minimal python
+conda activate mnedev_minimal
+
+echo "Installing IPython"
+$solver install ipython
 
 echo "Installing mne"
-curl --remote-name --ssl-no-revoke https://raw.githubusercontent.com/mne-tools/mne-python/main/environment.yml
-$solver env create -n mnedev -f environment.yml
-conda activate mnedev
+pip install mne
 mne sys_info
 
-rm ./environment.yml
+echo "Installing Qt"
+pip install PyQt5
 
 # Install dev-version of mne-python
 echo "Installing mne dependencies"
 cd "$script_root/mne-python"
 python -m pip uninstall -y mne
 pip install -e . --config-settings editable_mode=strict
-pip install -r requirements_doc.txt
 pip install -r requirements_testing.txt
-pip install -r requirements_testing_extra.txt
-$solver install -y graphviz
-$solver install -c conda-forge -y sphinx-autobuild doc8
 pre-commit install
 
 # Install dev-version of mne-qt-browser
 cd "$script_root/mne-qt-browser"
 python -m pip uninstall -y mne_qt_browser
-pip install -e .[opengl,tests] --config-settings editable_mode=strict
+call pip install -e .[opengl,tests] --config-settings editable_mode=strict
 
 # Install dev-version of mne-pipeline-hd
 cd "$script_root/mne-pipeline-hd"
-pip install -e .[tests] --config-settings editable_mode=stric
+call pip install -e .[tests] --config-settings editable_mode=strict

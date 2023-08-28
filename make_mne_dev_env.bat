@@ -45,13 +45,15 @@ call pip install -r requirements_testing_extra.txt
 call %solver% install -y graphviz
 call %solver% install -c conda-forge -y sphinx-autobuild doc8
 call pre-commit install
+
 :: Install dev-version of mne-qt-browser
 cd /d %script_root%/mne-qt-browser
 call python -m pip uninstall -y mne_qt_browser
-call pip install -e .[tests] --config-settings editable_mode=strict
+call pip install -e .[opengl,tests] --config-settings editable_mode=strict
+
 :: Install dev-version of mne-pipeline-hd
 cd /d %script_root%/mne-pipeline-hd
-call pip install -e .[opengl,tests] --config-settings editable_mode=strict
+call pip install -e .[tests] --config-settings editable_mode=strict
 
 Pause
 exit
