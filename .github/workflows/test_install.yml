@@ -34,14 +34,14 @@ jobs:
 
           # Create appopriate input for remaining questions
           if [ ${{ matrix.install_type == 'dev' }} ]; then
-            inputs = "$first_input\ny\n"
-            inputs_arr = ( $first_input y )
+            inputs="$first_input\ny\n"
+            inputs_arr=( $first_input y )
           elif [ ${{ matrix.install_type == 'stable_full' }} ]; then
-            inputs = "$first_input\nn\ntest\nn\n"
-            inputs_arr = ( $first_input n test n )
+            inputs="$first_input\nn\ntest\nn\n"
+            inputs_arr=( $first_input n test n )
           else
-            inputs = "$first_input\nn\ntest\ny\n"
-            inputs_arr = ( $first_input n test y )
+            inputs="$first_input\nn\ntest\ny\n"
+            inputs_arr=( $first_input n test y )
           fi
 
           # Save input to environment variable
