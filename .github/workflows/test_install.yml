@@ -27,9 +27,9 @@ jobs:
         run: |
           # Create appropriate input for first solver-question
           if [ ${{ matrix.solver == 'mamba' }} ]; then
-            first_input = y
+            first_input=y
           else
-            first_input = n
+            first_input=n
           fi
 
           # Create appopriate input for remaining questions
