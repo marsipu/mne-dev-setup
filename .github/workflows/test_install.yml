@@ -25,7 +25,7 @@ jobs:
         with:
           miniconda-version: latest
           auto-activate-base: true
-          use_mamba: ${{ matrix.solver == 'mamba' }}
+          use-mamba: ${{ matrix.solver == 'mamba' }}
       - name: 'Prepare variables'
         run: |
           # Create appropriate input for first solver-question
@@ -58,21 +58,22 @@ jobs:
           if [ ${{ matrix.os }} == 'windows-latest' ]; then
             printf '%s\n' "${inputs_arr[@]}" >> inputs.txt
           fi
+
+          # Create paths.ini (we don't need to activate conda since setup-miniconda does that for us)
+          echo "conda_root=$CONDA" >> paths.ini
+          echo "script_root=./projects" >> paths.ini
+
       - name: 'Clone development repositories'
         if: matrix.install_type == 'dev'
         run: |
           # Create script folder
           mkdir ./projects
-          cd ./projects
 
           # Clone projects
-          git clone https://github.com/mne-tools/mne-python.git
-          git clone https://github.com/mne-tools/mne-qt-browser.git
-          git clone https://github.com/marsipu/mne-pipeline-hd.git
+          git clone https://github.com/mne-tools/mne-python.git ./projects/mne-python
+          git clone https://github.com/mne-tools/mne-qt-browser.git ./projects/mne-qt-browser
+          git clone https://github.com/marsipu/mne-pipeline-hd.git ./projects/mne-pipeline-hd
 
-          # Create paths.ini (we don't need to activate conda since setup-miniconda does that for us)
-          echo "conda_root=" >> paths.ini
-          echo "script_root=./projects" >> paths.ini
       - name: 'Run installation script (Unix)'
         if: matrix.os != 'windows-latest'
         run: |

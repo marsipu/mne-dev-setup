@@ -29,10 +29,8 @@ for %%a in (%conda_root%, %script_root%) do (
     )
 )
 
-:: Activate Anaconda (if not GitHub Action)
-if "%GITHUB_ENV%" == "" (
-    call %conda_root%/Scripts/activate.bat %conda_root%
-)
+:: Activate Anaconda
+call %conda_root%/Scripts/activate.bat %conda_root%
 
 :: Use mamba or conda?
 set /P _solver="Do you want to use mamba? (y/n): "
