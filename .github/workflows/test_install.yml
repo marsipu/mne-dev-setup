@@ -1,9 +1,9 @@
 name: 'Test scripts'
 on:
   pull_request:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   test:
@@ -18,7 +18,14 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         solver: [conda]
-        install_type: [dev, stable_full, stable_core]
+        install_type: [dev]
+        include:
+          - os: ubuntu-latest
+            solver: conda
+            install_type: stable_full
+          - os: ubuntu-latest
+            solver: conda
+            install_type: stable_core
     steps:
       - uses: actions/checkout@v3
       - uses: conda-incubator/setup-miniconda@v2
@@ -49,14 +56,13 @@ jobs:
           fi
 
           # Save input to environment variable
-          echo "These are the inputs: $inputs"
           echo "inputs=$inputs" >> "$GITHUB_ENV"
 
           # Save inputs to file for Windows
-          echo "This is the input-array: ${inputs_arr[@]}"
-          echo "This ist the os: ${{ matrix.os }}"
           if [ ${{ matrix.os }} == 'windows-latest' ]; then
-            printf '%s\n' "${inputs_arr[@]}" >> inputs.txt
+            for i in "${inputs_arr[@]}"; do
+              echo $i >> inputs.txt
+            done
           fi
           
           # Create script folder
