@@ -58,6 +58,9 @@ jobs:
           if [ ${{ matrix.os }} == 'windows-latest' ]; then
             printf '%s\n' "${inputs_arr[@]}" >> inputs.txt
           fi
+          
+          # Create script folder
+          mkdir ./projects
 
           # Create paths.ini (we don't need to activate conda since setup-miniconda does that for us)
           echo "conda_root=$CONDA" >> paths.ini
@@ -66,9 +69,6 @@ jobs:
       - name: 'Clone development repositories'
         if: matrix.install_type == 'dev'
         run: |
-          # Create script folder
-          mkdir ./projects
-
           # Clone projects
           git clone https://github.com/mne-tools/mne-python.git ./projects/mne-python
           git clone https://github.com/mne-tools/mne-qt-browser.git ./projects/mne-qt-browser
