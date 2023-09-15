@@ -31,13 +31,6 @@ else
     solver=conda
 fi
 
-# Install mamba
-if [ $solver = mamba ]
-then
-    echo Installing mamba
-    conda install --yes --channel=conda-forge --name=base mamba
-fi
-
 read -p "Do you want to install a development environment? (y/n): " _inst_type
 
 if [ $_inst_type == n ]; then
