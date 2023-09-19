@@ -84,7 +84,7 @@ if %_inst_type%==n (
     :: Install dev-version of mne-python
     cd /d %script_root%/mne-python
     call python -m pip uninstall -y mne
-    call pip install -e .
+    call pip install --config-settings editable_mode=compat -e .
     call pip install -r requirements_doc.txt
     call pip install -r requirements_testing.txt
     call pip install -r requirements_testing_extra.txt
@@ -95,12 +95,12 @@ if %_inst_type%==n (
     echo Installing developement version of mne-qt-browser
     cd /d %script_root%/mne-qt-browser
     call python -m pip uninstall -y mne_qt_browser
-    call pip install -e .[opengl,tests]
+    call pip install --config-settings editable_mode=compat -e .[opengl,tests]
 
     :: Install dev-version of mne-pipeline-hd
     echo Installing
     cd /d %script_root%/mne-pipeline-hd
-    call pip install -e .[tests]
+    call pip install --config-settings editable_mode=compat -e .[tests]
 )
 
 
