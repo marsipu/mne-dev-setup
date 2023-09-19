@@ -40,12 +40,6 @@ if %_solver%==y (
     set solver=conda
 )
 
-:: Install mamba
-if %solver%==mamba (
-    echo Installing mamba...
-    call conda install --yes --channel=conda-forge --name=base mamba
-)
-
 set /P _inst_type="Do you want to install a development environment? (y/n): "
 
 if %_inst_type%==n (
