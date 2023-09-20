@@ -34,6 +34,20 @@ fi
 read -p "Do you want to install a development environment? (y/n): " _inst_type
 
 if [ $_inst_type == n ]; then
+  # Get version
+  read -p "Do you want to install a specific version of mne-python? (<version>/n): " _mne_version
+
+  if [ $_mne_version == n ]; then
+      _mne_core=mne-base
+      _mne_full=mne
+  else
+      _mne_core=mne-base\=\=$_mne_version
+      _mne_full=mne\=\=$_mne_version
+  fi
+
+  echo $_mne_core
+  echo $_mne_full
+
   # Get environment name
   read -p "Please enter environment-name: " _env_name
 
@@ -42,25 +56,25 @@ if [ $_inst_type == n ]; then
 
   if [[ $_core == y ]]; then
     echo Creating environment "$_env_name" and installing mne-python with core dependencies...
-    $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name mne-base
+    $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name $_mne_core
   else
     echo Creating environment "$_env_name" and installing mne-python with all dependencies...
-    $solver create --yes --override-channels --channel=conda-forge --name=$_env_name mne
+    $solver create --yes --override-channels --channel=conda-forge --name=$_env_name $_mne_full
   fi
 
-  conda activate $_env_name
+  $solver activate $_env_name
 
 else
   echo Creating development environment "mnedev"...
   # Remove existing environment
   echo Removing existing environment
-  conda env remove -n mnedev
+  $solver env remove -n mnedev
   rm -rf "$conda_root/envs/mnedev"
 
   echo Installing development version of mne-python
   curl --remote-name --ssl-no-revoke https://raw.githubusercontent.com/mne-tools/mne-python/main/environment.yml
   $solver env create -n mnedev -f environment.yml
-  conda activate mnedev
+  $solver activate mnedev
 
   # Delete environment.yml
   rm "environment.yml"

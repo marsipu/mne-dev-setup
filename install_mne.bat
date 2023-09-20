@@ -43,33 +43,44 @@ if %_solver%==y (
 set /P _inst_type="Do you want to install a development environment? (y/n): "
 
 if %_inst_type%==n (
-    :: Get environment name
-    set /P _env_name="Please enter environment-name: "
+    :: Get version
+    set /P _mne_version="Do you want to install a specific version of mne-python? (<version>/n): "
+
+    if !_mne_version!==n (
+        set _mne_core=mne-base
+        set _mne_full=mne
+    ) else (
+        set _mne_core=mne-base^=^=!_mne_version!
+        set _mne_full=mne^=^=!_mne_version!
+    )
 
     :: Install simple mne-environment
     set /P _core="Do you want to install only core dependencies? (y/n): "
 
+    :: Get environment name
+    set /P _env_name="Please enter environment-name: "
+
     if !_core!==y (
         echo Creating environment "!_env_name!" and installing mne-python with core dependencies...
-        call %solver% create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! mne-base
+        call %solver% create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! !_mne_core!
     ) else (
         echo Creating environment "!_env_name!" and installing mne-python with all dependencies...
-        call %solver% create --yes --override-channels --channel=conda-forge --name=!_env_name! mne
+        call %solver% create --yes --override-channels --channel=conda-forge --name=!_env_name! !_mne_full!
     )
     
-    call conda activate !_env_name!
+    call %solver% activate !_env_name!
 
 ) else (
     :: Remove existing environment
     echo Creating development environment "mnedev"...
     echo Removing existing environment
-    call conda env remove -n mnedev
+    call %solver% env remove -n mnedev
     rmdir /s /q %conda_root%/envs/mnedev
 
     echo Installing development version of mne-python
     call curl --remote-name --ssl-no-revoke https://raw.githubusercontent.com/mne-tools/mne-python/main/environment.yml
     call %solver% env create -n mnedev -f environment.yml
-    call conda activate mnedev
+    call %solver% activate mnedev
 
     :: Delete environment.yml
     call del "environment.yml"
