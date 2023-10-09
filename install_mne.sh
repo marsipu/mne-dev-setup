@@ -97,9 +97,15 @@ else
   pip install --config-settings editable_mode=compat -e .[opengl,tests]
 
   # Install dev-version of mne-pipeline-hd
-  echo Installing
+  echo Installing development version of mne-pipeline-hd
   cd "$script_root/mne-pipeline-hd" || exit
   pip install --config-settings editable_mode=compat -e .[tests]
+
+  # Install dev-version of NodeGraphQt
+  echo Installing development version of NodeGraphQt
+  cd "$script_root/NodeGraphQt" || exit
+  pip install --config-settings editable_mode=compat -e .
+
 fi
 
 # Printing System-Info

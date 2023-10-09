@@ -103,11 +103,15 @@ if %_inst_type%==n (
     call pip install --config-settings editable_mode=compat -e .[opengl,tests]
 
     :: Install dev-version of mne-pipeline-hd
-    echo Installing
+    echo Installing developement version of mne-pipeline-hd
     cd /d %script_root%/mne-pipeline-hd
     call pip install --config-settings editable_mode=compat -e .[tests]
-)
 
+    :: Install dev-version of NodeGraphQt
+    echo Installing development version of NodeGraphQt
+    cd /d %script_root%/NodeGraphQt_qtpy
+    call pip install --config-settings editable_mode=compat -e .
+)
 
 :: Printing System-Info
 call mne sys_info
