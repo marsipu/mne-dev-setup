@@ -1,6 +1,11 @@
 #!/bin/bash
 # This batch file creates a mne-environment
-# It has to be run with bash -i to source .bashrc
+# It has to be run with 'bash -i install_mne.sh' to source .bashrc
+
+# You need to specify the path to your conda-root and the path to the script-root, where you store the folders 
+# of your development version of mne-python, mne-qt-browser, mne-pipeline-hd etc. in a paths.ini file, like this:
+# conda_root=C:\Users\user\Anaconda3
+# script_root=C:\Users\user\Documents\GitHub\mne-python
 
 # Read version
 source ./version.txt

@@ -1,6 +1,10 @@
 :: This batch file creates a mne-environment
+:: You need to specify the path to your conda-root and the path to the script-root, where you store the folders 
+:: of your development version of mne-python, mne-qt-browser, mne-pipeline-hd etc. in a paths.ini file, like this:
+:: conda_root=C:\Users\user\Anaconda3
+:: script_root=C:\Users\user\Documents\GitHub\mne-python
 
-: This disables printing every command from the script
+:: This disables printing every command from the script
 @echo off
 :: This is necessary to allow setting variables inside if-blocks
 :: https://superuser.com/questions/78496/variables-in-batch-file-not-being-set-when-inside-if
