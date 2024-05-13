@@ -88,7 +88,7 @@ else
   # Install dev-version of mne-python
   cd "$script_root/mne-python" || exit
   python -m pip uninstall -y mne
-  pip install --config-settings editable_mode=compat -e .
+  pip install -e .
   pip install -r requirements_doc.txt
   pip install -r requirements_testing.txt
   pip install -r requirements_testing_extra.txt
@@ -99,17 +99,17 @@ else
   echo Installing developement version of mne-qt-browser
   cd "$script_root/mne-qt-browser" || exit
   python -m pip uninstall -y mne_qt_browser
-  pip install --config-settings editable_mode=compat -e .[opengl,tests]
+  pip install -e .[opengl,tests]
 
   # Install dev-version of mne-pipeline-hd
   echo Installing development version of mne-pipeline-hd
   cd "$script_root/mne-pipeline-hd" || exit
-  pip install --config-settings editable_mode=compat -e .[tests]
+  pip install -e .[tests]
 
   # Install dev-version of NodeGraphQt
   echo Installing development version of NodeGraphQt
   cd "$script_root/NodeGraphQt" || exit
-  pip install --config-settings editable_mode=compat -e .
+  pip install -e .
 
 fi
 
