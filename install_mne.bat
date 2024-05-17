@@ -109,12 +109,7 @@ if %_inst_type%==n (
     :: Install dev-version of mne-pipeline-hd
     echo Installing developement version of mne-pipeline-hd
     cd /d %script_root%/mne-pipeline-hd
-    call pip install -e .[tests]
-
-    :: Install dev-version of NodeGraphQt
-    echo Installing development version of NodeGraphQt
-    cd /d %script_root%/NodeGraphQt_qtpy
-    call pip install -e .
+    call pip install -e .[tests,docs]
 )
 
 :: Printing System-Info

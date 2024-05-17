@@ -104,13 +104,7 @@ else
   # Install dev-version of mne-pipeline-hd
   echo Installing development version of mne-pipeline-hd
   cd "$script_root/mne-pipeline-hd" || exit
-  pip install -e .[tests]
-
-  # Install dev-version of NodeGraphQt
-  echo Installing development version of NodeGraphQt
-  cd "$script_root/NodeGraphQt" || exit
-  pip install -e .
-
+  pip install -e .[tests,docs]
 fi
 
 # Printing System-Info
