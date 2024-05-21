@@ -93,10 +93,7 @@ if %_inst_type%==n (
     :: Install dev-version of mne-python
     cd /d %script_root%/mne-python
     call python -m pip uninstall -y mne
-    call pip install -e .
-    call pip install -r requirements_doc.txt
-    call pip install -r requirements_testing.txt
-    call pip install -r requirements_testing_extra.txt
+    call pip install -e .[test,test_extra,doc]
     call %solver% install -c conda-forge -y sphinx-autobuild doc8 graphviz
     call pre-commit install
 
