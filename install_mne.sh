@@ -88,7 +88,7 @@ else
   # Install dev-version of mne-python
   cd "$script_root/mne-python" || exit
   python -m pip uninstall -y mne
-  pip install -e .[test,test_extra,doc]
+  pip install -e .[full,test,test_extra,doc]
   $solver install -c conda-forge -y sphinx-autobuild doc8 graphviz
   pre-commit install
 
