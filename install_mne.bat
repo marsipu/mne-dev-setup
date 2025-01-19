@@ -25,7 +25,7 @@ echo Conda-Root: %conda_root%
 echo Script-Root: %script_root%
 
 :: Check if all paths exist
-for %%a in (%conda_root%, %script_root%) do (
+for %%a in (%conda_root% %script_root%) do (
     if not exist %%a (
         echo Path %%a does not exist, exiting...
         Pause
@@ -36,12 +36,26 @@ for %%a in (%conda_root%, %script_root%) do (
 :: Activate Anaconda
 call %conda_root%/Scripts/activate.bat %conda_root%
 
-:: Use mamba or conda?
-set /P _solver="Do you want to use mamba? (y/n): "
-if %_solver%==y (
+:: Configure package solver
+where mamba >nul 2>nul
+if %errorlevel%==0 (
+    set mamba_installed=true
+) else (
+    set mamba_installed=false
+)
+
+if %mamba_installed%==true (
+    set /P use_mamba="Do you want to use mamba? (y/n): "
+) else (
+    set use_mamba=n
+)
+
+if %use_mamba%==y (
     set solver=mamba
+    echo "Using mamba as solver..."
 ) else (
     set solver=conda
+    echo "Using conda as solver..."
 )
 
 set /P _inst_type="Do you want to install a development environment? (y/n): "
@@ -78,8 +92,7 @@ if %_inst_type%==n (
     :: Remove existing environment
     echo Creating development environment "mnedev"...
     echo Removing existing environment
-    call %solver% env remove -n mnedev
-    rmdir /s /q %conda_root%/envs/mnedev
+    call %solver% env remove -n mnedev -y
 
     echo Installing development version of mne-python
     call curl --remote-name --ssl-no-revoke https://raw.githubusercontent.com/mne-tools/mne-python/main/environment.yml

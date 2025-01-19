@@ -16,8 +16,8 @@ source ./paths.ini
 echo Conda-Root: $conda_root
 echo Script-Root: $script_root
 
-# :: Check if all paths exist
-paths=($root $conda_root $script_root)
+# Check if all paths exist
+paths=($conda_root $script_root)
 for path in ${paths[@]};
 do
     if [ ! -d $path ]
@@ -27,13 +27,21 @@ do
     fi
 done
 
-# Use mamba or conda?
-read -p "Do you want to use mamba? [y/n]: " _solver
-if [ $_solver = y ]
+# Configure package solver
+if command -v mamba &> /dev/null
 then
+    read -p "Do you want to use mamba? [y/n]: " use_mamba
+else
+    echo "Mamba is not installed. Using conda."
+    use_mamba=n
+fi
+
+if [ "$use_mamba" == "y" ]; then
     solver=mamba
+    echo "Using mamba as solver..."
 else
     solver=conda
+    echo "Using conda as solver..."
 fi
 
 read -p "Do you want to install a development environment? (y/n): " _inst_type
@@ -67,19 +75,18 @@ if [ $_inst_type == n ]; then
     $solver create --yes --override-channels --channel=conda-forge --name=$_env_name $_mne_full
   fi
 
-  $solver activate $_env_name
+  source activate $_env_name
 
 else
   echo Creating development environment "mnedev"...
   # Remove existing environment
   echo Removing existing environment
-  $solver env remove -n mnedev
-  rm -rf "$conda_root/envs/mnedev"
+  $solver env remove -n mnedev -y
 
   echo Installing development version of mne-python
   curl --remote-name --ssl-no-revoke https://raw.githubusercontent.com/mne-tools/mne-python/main/environment.yml
   $solver env create -n mnedev -f environment.yml
-  $solver activate mnedev
+  source activate mnedev
 
   # Delete environment.yml
   rm "environment.yml"
@@ -93,7 +100,7 @@ else
   pre-commit install
 
   # Install dev-version of mne-qt-browser
-  echo Installing developement version of mne-qt-browser
+  echo Installing development version of mne-qt-browser
   cd "$script_root/mne-qt-browser" || exit
   python -m pip uninstall -y mne_qt_browser
   pip install -e .[opengl,tests]
