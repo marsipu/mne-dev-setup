@@ -108,7 +108,7 @@ else
   # Install dev-version of mne-pipeline-hd
   echo Installing development version of mne-pipeline-hd
   cd "$script_root/mne-pipeline-hd" || exit
-  pip install -e .[tests,docs]
+  pip install -e .[dev,docs]
 fi
 
 # Printing System-Info
