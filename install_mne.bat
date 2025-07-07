@@ -52,10 +52,10 @@ if %mamba_installed%==true (
 
 if %use_mamba%==y (
     set solver=mamba
-    echo "Using mamba as solver..."
+    echo Using mamba as solver...
 ) else (
     set solver=conda
-    echo "Using conda as solver..."
+    echo Using conda as solver...
 )
 
 set /P _inst_type="Do you want to install a development environment? (y/n): "
@@ -116,9 +116,9 @@ if %_inst_type%==n (
     call python -m pip uninstall -y mne_qt_browser
     call pip install -e .[opengl,tests]
 
-    :: Install dev-version of mne-pipeline-hd
+    :: Install dev-version of mne-nodes
     echo Installing developement version of mne-pipeline-hd
-    cd /d %script_root%/mne-pipeline-hd
+    cd /d %script_root%/mne-nodes
     call pip install -e .[tests,docs]
 )
 

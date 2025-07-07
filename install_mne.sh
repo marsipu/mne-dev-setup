@@ -105,9 +105,9 @@ else
   python -m pip uninstall -y mne_qt_browser
   pip install -e .[opengl,tests]
 
-  # Install dev-version of mne-pipeline-hd
-  echo Installing development version of mne-pipeline-hd
-  cd "$script_root/mne-pipeline-hd" || exit
+  # Install dev-version of mne-nodes
+  echo Installing development version of mne-nodes
+  cd "$script_root/mne-nodes" || exit
   pip install -e .[tests,docs]
 fi
 
