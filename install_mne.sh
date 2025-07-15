@@ -109,6 +109,7 @@ else
   echo Installing development version of mne-nodes
   cd "$script_root/mne-nodes" || exit
   pip install -e .[dev,docs]
+  pre-commit install
 fi
 
 # Printing System-Info

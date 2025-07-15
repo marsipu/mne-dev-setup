@@ -120,6 +120,7 @@ if %_inst_type%==n (
     echo Installing developement version of mne-pipeline-hd
     cd /d %script_root%/mne-nodes
     call pip install -e .[dev,docs]
+    call pre-commit install
 )
 
 :: Printing System-Info
