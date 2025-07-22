@@ -94,9 +94,9 @@ else
   echo Installing mne-python development dependencies...
   # Install dev-version of mne-python
   cd "$script_root/mne-python" || exit
-  python -m pip uninstall -y mne
+  conda remove --force mne-base 
   pip install -e .[full,test,test_extra,doc]
-  $solver install -c conda-forge -y sphinx-autobuild doc8 graphviz
+  $solver install -c conda-forge -y sphinx-autobuild doc8 graphviz cupy
   pre-commit install
 
   # Install dev-version of mne-qt-browser
