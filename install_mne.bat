@@ -75,7 +75,7 @@ if "!_install_cupy!"=="" (
     echo No cupy installation preference entered, proceeding without cupy...
 ) else if !_install_cupy!==y (
     echo cupy will be installed...
-    set cupy=y
+    set install_cupy=y
 ) else if !_install_cupy!==n (
     echo cupy will not be installed...
 ) else (
@@ -114,9 +114,20 @@ if %installation_type%==normal (
         call %solver% create --yes --override-channels --channel=conda-forge --name=!_env_name! !_mne_full!
     )
     
-    call %solver% activate !_env_name!
+    call "%conda_root%\\Scripts\\activate.bat" activate !_env_name!
 
 ) else (
+    :: Get python version
+    set python_version=
+    set /P _python_version="Do you want to install a specific version of Python? (<version>/n): "
+    if !_python_version!==n (
+        echo No Python version entered, proceeding with latest version...
+    ) else if "!_python_version!"=="" (
+        echo No Python version entered, proceeding with latest version...
+    ) else (
+        set python_version="==!_python_version!"
+        echo Python version set to !python_version!.
+    )
     set /P _qt_type="Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): "
     set qt_variant=pyside6
     if "!_qt_type!"=="" (
@@ -140,7 +151,7 @@ if %installation_type%==normal (
     ) else if "!_qt_version!"=="n" (
         echo No Qt version entered, proceeding with latest version...
     ) else (
-        set qt_version="==%_qt_version%"
+        set qt_version="==!_qt_version!"
     )
     :: Remove environment if possible
     set env_name=mnedev_!qt_variant!!qt_version!
@@ -148,15 +159,15 @@ if %installation_type%==normal (
     call %solver% env remove -n !env_name! -y
     :: Create new environment
     echo Creating development environment !env_name!...
-    call %solver% create -n !env_name! -y
-    call %solver% activate !env_name!
+    call %solver% create -n !env_name! -y python!python_version!
+    call "%conda_root%\\Scripts\\activate.bat" activate !env_name!
     :: Installing Qt
     echo Installing Qt variant !qt_variant!!qt_version!...
     call pip install !qt_variant!!qt_version!
     :: Install dev-version of mne-python
     echo Installing development version of mne-python...
     cd /d %script_root%/mne-python
-    call pip install -e .[full-no-qt,test,test_extra,doc]
+    call pip install -e .[full-no-qt,test,doc]
     :: Initialize pre-commit
     call pip install pre-commit
     call pre-commit install
@@ -170,14 +181,16 @@ if %installation_type%==normal (
     cd /d %script_root%/mne-nodes
     call pip install -e .[test,docs]
     call pre-commit install
-    :: Install cupy if requested
-    if "%install_cupy%"=="y" (
-        echo Installing cupy...
-        call pip install cupy
-    )
+)
+
+:: Install cupy if requested
+if "%install_cupy%"=="y" (
+    echo Installing cupy...
+    call pip install cupy-cuda12x
 )
 
 :: Printing System-Info
 call mne sys_info
 
 Pause
+exit 0

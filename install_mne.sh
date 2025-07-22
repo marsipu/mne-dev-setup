@@ -100,6 +100,14 @@ if [[ "$installation_type" == "normal" ]]; then
     source activate $_env_name
 
 else
+    # Get Python version
+    read -p "Do you want to install a specific version of Python? (<version>/n): " _python_version
+    python_version=""
+    if [[ -z "$_python_version" || "$_python_version" == "n" ]]; then
+        echo "No Python version entered, proceeding with latest version..."
+    else
+        python_version="==$_python_version"
+    fi
     # Qt variant selection (mirroring .bat logic)
     read -p "Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): " _qt_type
     qt_variant=pyside6
@@ -130,14 +138,14 @@ else
     echo Removing existing environment $env_name if necessary...
     $solver env remove -n $env_name -y
     echo Creating development environment $env_name...
-    $solver create -n $env_name -y
+    $solver create -n $env_name -y python$python_version
     source activate $env_name
     echo Installing Qt variant ${qt_variant}${qt_version}...
     pip install ${qt_variant}${qt_version}
 
     echo Installing development version of mne-python...
     cd "$script_root/mne-python" || exit
-    pip install -e .[full-no-qt,test,test_extra,doc]
+    pip install -e .[full-no-qt,test,doc]
 
     # Initialize pre-commit
     pip install pre-commit
@@ -152,14 +160,13 @@ else
     cd "$script_root/mne-nodes" || exit
     pip install -e .[test,docs]
     pre-commit install
-    # Install cupy if requested
-    if [[ "$install_cupy" == "y" ]]; then
-        echo Installing cupy...
-        pip install cupy
-    fi
+fi
+
+# Install cupy if requested
+if [[ "$install_cupy" == "y" ]]; then
+    echo Installing cupy...
+    pip install cupy-cuda12x
 fi
 
 # Printing System-Info
 mne sys_info
-
-exit 0
