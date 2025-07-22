@@ -44,72 +44,103 @@ else
     echo "Using conda as solver..."
 fi
 
+
+# Improved logic for environment type selection (mirroring .bat logic)
 read -p "Do you want to install a development environment? (y/n): " _inst_type
+installation_type=dev
+if [[ -z "$_inst_type" ]]; then
+    echo "No installation type entered, proceeding with development environment..."
+elif [[ "$_inst_type" == "y" ]]; then
+    installation_type=dev
+elif [[ "$_inst_type" == "n" ]]; then
+    installation_type=normal
+else
+    echo "Invalid installation type entered, proceeding with development environment..."
+fi
 
-if [ $_inst_type == n ]; then
-  # Get version
-  read -p "Do you want to install a specific version of mne-python? (<version>/n): " _mne_version
+if [[ "$installation_type" == "normal" ]]; then
+    # Get version
+    read -p "Do you want to install a specific version of mne-python? (<version>/n): " _mne_version
 
-  if [ $_mne_version == n ]; then
-      _mne_core=mne-base
-      _mne_full=mne
-  else
-      _mne_core=mne-base\=\=$_mne_version
-      _mne_full=mne\=\=$_mne_version
-  fi
+    if [[ -z "$_mne_version" || "$_mne_version" == "n" ]]; then
+        _mne_core=mne-base
+        _mne_full=mne
+    else
+        _mne_core=mne-base\=\=$_mne_version
+        _mne_full=mne\=\=$_mne_version
+    fi
 
-  echo $_mne_core
-  echo $_mne_full
+    # Get environment name
+    read -p "Please enter environment-name: " _env_name
+    if [[ -z "$_env_name" ]]; then
+        echo "No environment name entered, proceeding with default name mne..."
+        _env_name=mne
+    fi
 
-  # Get environment name
-  read -p "Please enter environment-name: " _env_name
+    # Install simple mne-environment
+    read -p "Do you want to install only core dependencies? (y/n): " _core
 
-  # Install simple mne-environment
-  read -p "Do you want to install only core dependencies? (y/n): " _core
+    if [[ "$_core" == "y" ]]; then
+        echo Creating environment "$_env_name" and installing mne-python with core dependencies...
+        $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name $_mne_core
+    else
+        echo Creating environment "$_env_name" and installing mne-python with all dependencies...
+        $solver create --yes --override-channels --channel=conda-forge --name=$_env_name $_mne_full
+    fi
 
-  if [[ $_core == y ]]; then
-    echo Creating environment "$_env_name" and installing mne-python with core dependencies...
-    $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name $_mne_core
-  else
-    echo Creating environment "$_env_name" and installing mne-python with all dependencies...
-    $solver create --yes --override-channels --channel=conda-forge --name=$_env_name $_mne_full
-  fi
-
-  source activate $_env_name
+    source activate $_env_name
 
 else
-  echo Creating development environment "mnedev"...
-  # Remove existing environment
-  echo Removing existing environment
-  $solver env remove -n mnedev -y
+    # Qt variant selection (mirroring .bat logic)
+    read -p "Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): " _qt_type
+    qt_variant=pyside6
+    if [[ -z "$_qt_type" ]]; then
+        echo "No Qt variant entered, proceeding with default PySide6..."
+    elif [[ "$_qt_type" == "1" ]]; then
+        qt_variant=pyside6
+    elif [[ "$_qt_type" == "2" ]]; then
+        qt_variant=pyqt6
+    elif [[ "$_qt_type" == "3" ]]; then
+        qt_variant=pyside2
+    elif [[ "$_qt_type" == "4" ]]; then
+        qt_variant=pyqt5
+    else
+        echo "Invalid Qt variant entered, proceeding with default PySide6..."
+    fi
 
-  echo Installing development version of mne-python
-  curl --remote-name --ssl-no-revoke https://raw.githubusercontent.com/mne-tools/mne-python/main/environment.yml
-  $solver env create -n mnedev -f environment.yml
-  source activate mnedev
+    # Specify Qt version
+    read -p "Do you want to install a specific version of Qt? (<version-number>/n): " _qt_version
+    qt_version=""
+    if [[ -z "$_qt_version" || "$_qt_version" == "n" ]]; then
+        echo "No Qt version entered, proceeding with latest version..."
+    else
+        qt_version==$_qt_version
+    fi
 
-  # Delete environment.yml
-  rm "environment.yml"
+    env_name=mnedev_${qt_variant}${qt_version}
+    echo Removing existing environment $env_name if necessary...
+    $solver env remove -n $env_name -y
+    echo Creating development environment $env_name...
+    $solver create -n $env_name -y
+    source activate $env_name
+    echo Installing Qt variant ${qt_variant}${qt_version}...
+    pip install ${qt_variant}${qt_version}
 
-  echo Installing mne-python development dependencies...
-  # Install dev-version of mne-python
-  cd "$script_root/mne-python" || exit
-  conda remove --force mne-base 
-  pip install -e .[full,test,test_extra,doc]
-  $solver install -c conda-forge -y sphinx-autobuild doc8 graphviz cupy
-  pre-commit install
+    echo Installing development version of mne-python...
+    cd "$script_root/mne-python" || exit
+    pip install -e .[full-no-qt,test,test_extra,doc]
+    $solver install -c conda-forge -y sphinx-autobuild doc8 graphviz cupy
+    pre-commit install
 
-  # Install dev-version of mne-qt-browser
-  echo Installing development version of mne-qt-browser
-  cd "$script_root/mne-qt-browser" || exit
-  python -m pip uninstall -y mne_qt_browser
-  pip install -e .[opengl,tests]
+    echo Installing development version of mne-qt-browser
+    cd "$script_root/mne-qt-browser" || exit
+    python -m pip uninstall -y mne_qt_browser
+    pip install -e .[opengl,tests]
 
-  # Install dev-version of mne-nodes
-  echo Installing development version of mne-nodes
-  cd "$script_root/mne-nodes" || exit
-  pip install -e .[dev,docs]
-  pre-commit install
+    echo Installing development version of mne-nodes
+    cd "$script_root/mne-nodes" || exit
+    pip install -e .[dev,docs]
+    pre-commit install
 fi
 
 # Printing System-Info

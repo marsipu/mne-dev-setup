@@ -58,22 +58,27 @@ if %use_mamba%==y (
 )
 
 set /P _inst_type="Do you want to install a development environment? (y/n): "
+set installation_type=dev
 if "!_inst_type!"=="" (
+    echo No installation type entered, proceeding with development environment...
+) else if "!_inst_type!"=="y" (
     set installation_type=dev
-    echo "No installation type entered, proceeding with development environment..."
-) else if !_inst_type!==y (
-    set installation_type=dev
-) else if !_inst_type!==n (
+) else if "!_inst_type!"=="n" (
     set installation_type=normal
+) else (
+    echo Invalid installation type entered, proceeding with development environment...
 )
 
-if %_inst_type%==n (
+
+if %installation_type%==normal (
     :: Get version
     set /P _mne_version="Do you want to install a specific version of mne-python? (<version>/n): "
 
     if !_mne_version!==n (
         set _mne_core=mne-base
         set _mne_full=mne
+    ) else if "!_mne_version!"=="" (
+        echo No version entered, proceeding with latest version...
     ) else (
         set _mne_core=mne-base^=^=!_mne_version!
         set _mne_full=mne^=^=!_mne_version!
@@ -112,6 +117,8 @@ if %_inst_type%==n (
         set qt_variant=pyside2
     ) else if !_qt_type!==4 (
         set qt_variant=pyqt5
+    ) else (
+        echo Invalid Qt variant entered, proceeding with default PySide6...
     )
     :: Specify Qt version
     set /P _qt_version="Do you want to install a specific version of Qt? (<version-number>/n): "
