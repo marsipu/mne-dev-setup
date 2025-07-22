@@ -58,6 +58,15 @@ else
     echo "Invalid installation type entered, proceeding with development environment..."
 fi
 
+read -p "Do you want to install CUDA processing with cupy? (y/n): " _install_cupy
+install_cupy=n
+if [[ -z "$_install_cupy" || "$_install_cupy" == "n" ]]; then
+    echo "Cupy will not be installed."
+else
+    echo "Cupy will be installed."
+    install_cupy=y
+fi
+
 if [[ "$installation_type" == "normal" ]]; then
     # Get version
     read -p "Do you want to install a specific version of mne-python? (<version>/n): " _mne_version
@@ -129,18 +138,25 @@ else
     echo Installing development version of mne-python...
     cd "$script_root/mne-python" || exit
     pip install -e .[full-no-qt,test,test_extra,doc]
-    $solver install -c conda-forge -y sphinx-autobuild doc8 graphviz cupy
+
+    # Initialize pre-commit
+    pip install pre-commit
     pre-commit install
 
     echo Installing development version of mne-qt-browser
     cd "$script_root/mne-qt-browser" || exit
-    python -m pip uninstall -y mne_qt_browser
+    pip uninstall -y mne_qt_browser
     pip install -e .[opengl,tests]
 
     echo Installing development version of mne-nodes
     cd "$script_root/mne-nodes" || exit
-    pip install -e .[dev,docs]
+    pip install -e .[test,docs]
     pre-commit install
+    # Install cupy if requested
+    if [[ "$install_cupy" == "y" ]]; then
+        echo Installing cupy...
+        pip install cupy
+    fi
 fi
 
 # Printing System-Info

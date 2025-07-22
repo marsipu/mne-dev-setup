@@ -69,6 +69,18 @@ if "!_inst_type!"=="" (
     echo Invalid installation type entered, proceeding with development environment...
 )
 
+set /P _install_cupy="Do you want to install CUDA processing with cupy? (y/n): "
+set install_cupy=n
+if "!_install_cupy!"=="" (
+    echo No cupy installation preference entered, proceeding without cupy...
+) else if !_install_cupy!==y (
+    echo cupy will be installed...
+    set cupy=y
+) else if !_install_cupy!==n (
+    echo cupy will not be installed...
+) else (
+    echo Invalid cupy installation preference entered, proceeding without cupy...
+)
 
 if %installation_type%==normal (
     :: Get version
@@ -145,23 +157,27 @@ if %installation_type%==normal (
     echo Installing development version of mne-python...
     cd /d %script_root%/mne-python
     call pip install -e .[full-no-qt,test,test_extra,doc]
-    echo Installing mne-python development dependencies...
-    call %solver% install -c conda-forge -y sphinx-autobuild doc8 graphviz cupy
+    :: Initialize pre-commit
+    call pip install pre-commit
     call pre-commit install
     :: Install dev-version of mne-qt-browser
     echo Installing development version of mne-qt-browser
     cd /d %script_root%/mne-qt-browser
-    call python -m pip uninstall -y mne_qt_browser
+    call pip uninstall -y mne_qt_browser
     call pip install -e .[opengl,tests]
     :: Install dev-version of mne-nodes
-    echo Installing development version of mne-pipeline-hd
+    echo Installing development version of mne-nodes
     cd /d %script_root%/mne-nodes
-    call pip install -e .[dev,docs]
+    call pip install -e .[test,docs]
     call pre-commit install
+    :: Install cupy if requested
+    if "%install_cupy%"=="y" (
+        echo Installing cupy...
+        call pip install cupy
+    )
 )
 
 :: Printing System-Info
 call mne sys_info
 
 Pause
-exit 0
