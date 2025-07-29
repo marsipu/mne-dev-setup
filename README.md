@@ -1,6 +1,7 @@
 # MNE Installation Scripts Configuration
 
 ## Overview
+
 These scripts provide a flexible way to set up MNE-Python development environments. The installation process is split into two phases:
 
 1. **Environment Creation**: Creates conda environments with basic packages
@@ -12,10 +13,10 @@ These scripts provide a flexible way to set up MNE-Python development environmen
 Edit the `paths.ini` file to configure your installation:
 
 ```ini
-# Required paths
+# Required path
 conda_root=C:/Users/user/miniconda3
 
-# Development package paths (optional)
+# Development package paths (optional - only for development installations)
 # Only define paths for packages you want to install in development mode
 # These should point to the root directory of each package (containing setup.py or pyproject.toml)
 
@@ -34,18 +35,22 @@ mne_nodes_path=C:/Users/user/Code/mne-nodes
 ## Usage
 
 ### Windows
-1. **Create environment**: Run `install_mne.bat` or `create_mne_env.bat`
+
+1. **Create environment**: Run `create_mne_env.bat`
 2. **Activate environment**: `conda activate <environment-name>`
 3. **Install packages**: 
    - Normal installation: `install_mne_normal_win.bat`
    - Development installation: `install_mne_dev_win.bat`
 
 ### Linux/macOS
-1. **Create environment**: Run `./install_mne.sh`
+
+**Important**: Shell scripts must be run with the `-i` flag to properly source `.bashrc`:
+
+1. **Create environment**: Run `bash -i create_mne_env.sh`
 2. **Activate environment**: `conda activate <environment-name>`
 3. **Install packages**:
-   - Normal installation: `./install_mne_normal_unix.sh`
-   - Development installation: `./install_mne_dev_unix.sh`
+   - Normal installation: `bash -i install_mne_normal_unix.sh`
+   - Development installation: `bash -i install_mne_dev_unix.sh`
 
 ## Development Package Details
 
@@ -58,16 +63,6 @@ mne_nodes_path=C:/Users/user/Code/mne-nodes
 
 ### Pre-commit Hooks
 For packages that support it, pre-commit hooks are automatically installed to ensure code quality.
-
-## Flexibility for Contributors
-
-This setup allows anyone to:
-1. Install only the packages they're working on
-2. Skip packages they don't need
-3. Use custom directory structures
-4. Easily add new MNE ecosystem packages
-
-Simply clone the repositories you want to work on and update the paths in `paths.ini` accordingly.
 
 ## Acknowledgement
 This script was created and modified with help from GitHub Copilot in Agent Mode.

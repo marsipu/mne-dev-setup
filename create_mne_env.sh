@@ -1,11 +1,13 @@
 #!/bin/bash
-# This batch file creates a mne-environment
-# It has to be run with 'bash -i install_mne.sh' to source .bashrc
+# This script creates a mne-environment
+# It has to be run with 'bash -i create_mne_env.sh' to source .bashrc
 
-# You need to specify the path to your conda-root and the path to the script-root, where you store the folders 
-# of your development version of mne-python, mne-qt-browser, mne-pipeline-hd etc. in a paths.ini file, like this:
+# You need to specify the path to your conda-root in a paths.ini file, like this:
 # conda_root=C:\Users\user\Anaconda3
-# script_root=C:\Users\user\Documents\GitHub\mne-python
+# 
+# For development installations, also specify paths to the packages you want to develop:
+# mne_python_path=C:\Users\user\Code\mne-python
+# mne_qt_browser_path=C:\Users\user\Code\mne-qt-browser
 
 # Read version
 source ./version.txt
@@ -14,18 +16,13 @@ echo Running mne-python installation script $version for MacOs/Linux...
 # Read paths from paths.ini
 source ./paths.ini
 echo Conda-Root: $conda_root
-echo Script-Root: $script_root
 
-# Check if all paths exist
-paths=($conda_root $script_root)
-for path in ${paths[@]};
-do
-    if [ ! -d $path ]
-    then
-        echo "Path $path does not exist"
-        exit 1
-    fi
-done
+# Check if conda path exists
+if [ ! -d "$conda_root" ]
+then
+    echo "Path $conda_root does not exist, exiting..."
+    exit 1
+fi
 
 # Configure package solver
 if command -v mamba &> /dev/null
@@ -143,6 +140,6 @@ else
     echo "To complete the installation, please activate the environment and run the installation script:"
     echo
     echo "  conda activate $env_name"
-    echo "  ./install_mne_dev_unix.sh"
+    echo "  ./install_mne_dev.sh"
     echo
 fi
