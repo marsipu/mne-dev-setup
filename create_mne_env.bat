@@ -92,9 +92,6 @@ if %installation_type%==normal (
     :: Get core dependencies preference
     set /P _core="Do you want to install only core dependencies? (y/n): "
 
-    :: Get cupy preference
-    set /P _install_cupy="Do you want to install CUDA processing with cupy? (y/n): "
-
     :: Remove existing environment if it exists
     echo Removing existing environment !_env_name! if necessary...
     call !solver! env remove -n !_env_name! -y
@@ -103,18 +100,10 @@ if %installation_type%==normal (
     echo Creating environment "!_env_name!" with Python and MNE...
     if "!_core!"=="y" (
         echo Installing mne-python with core dependencies...
-        if "!_install_cupy!"=="y" (
-            call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_core! cupy
-        ) else (
-            call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_core!
-        )
+        call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_core!
     ) else (
         echo Installing mne-python with all dependencies...
-        if "!_install_cupy!"=="y" (
-            call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_full! cupy
-        ) else (
-            call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_full!
-        )
+        call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_full!
     )
 
     echo.

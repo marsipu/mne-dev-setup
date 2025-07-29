@@ -175,13 +175,6 @@ else
     echo "Skipping mne-nodes installation..."
 fi
 
-# Get cupy preference
-read -p "Do you want to install CUDA processing with cupy? (y/n): " _install_cupy
-if [[ "$_install_cupy" == "y" ]]; then
-    echo "Installing cupy..."
-    pip install cupy-cuda12x
-fi
-
 echo "Development installation completed successfully!"
 echo
 echo "Printing System-Info:"

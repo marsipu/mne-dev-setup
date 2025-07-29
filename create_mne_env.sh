@@ -77,9 +77,6 @@ if [[ "$installation_type" == "normal" ]]; then
     # Get core dependencies preference
     read -p "Do you want to install only core dependencies? (y/n): " _core
 
-    # Get cupy preference
-    read -p "Do you want to install CUDA processing with cupy? (y/n): " _install_cupy
-
     # Remove existing environment if it exists
     echo "Removing existing environment $_env_name if necessary..."
     $solver env remove -n $_env_name -y
@@ -88,18 +85,10 @@ if [[ "$installation_type" == "normal" ]]; then
     echo "Creating environment \"$_env_name\" with Python and MNE..."
     if [[ "$_core" == "y" ]]; then
         echo "Installing mne-python with core dependencies..."
-        if [[ "$_install_cupy" == "y" ]]; then
-            $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_core cupy
-        else
-            $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_core
-        fi
+        $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_core
     else
         echo "Installing mne-python with all dependencies..."
-        if [[ "$_install_cupy" == "y" ]]; then
-            $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_full cupy
-        else
-            $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_full
-        fi
+        $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_full
     fi
 
     echo
