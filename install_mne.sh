@@ -109,7 +109,7 @@ else
         python_version="==$_python_version"
     fi
     # Qt variant selection (mirroring .bat logic)
-    read -p "Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): " _qt_type
+    read -p "Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6): " _qt_type
     qt_variant=pyside6
     if [[ -z "$_qt_type" ]]; then
         echo "No Qt variant entered, proceeding with default PySide6..."
@@ -117,10 +117,6 @@ else
         qt_variant=pyside6
     elif [[ "$_qt_type" == "2" ]]; then
         qt_variant=pyqt6
-    elif [[ "$_qt_type" == "3" ]]; then
-        qt_variant=pyside2
-    elif [[ "$_qt_type" == "4" ]]; then
-        qt_variant=pyqt5
     else
         echo "Invalid Qt variant entered, proceeding with default PySide6..."
     fi
@@ -131,7 +127,7 @@ else
     if [[ -z "$_qt_version" || "$_qt_version" == "n" ]]; then
         echo "No Qt version entered, proceeding with latest version..."
     else
-        qt_version==$_qt_version
+        qt_version===$_qt_version
     fi
 
     env_name=mnedev_${qt_variant}${qt_version}
