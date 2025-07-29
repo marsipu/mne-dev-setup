@@ -147,18 +147,14 @@ if %installation_type%==normal (
         set python_version="==!_python_version!"
         echo Python version set to !python_version!.
     )
-    set /P _qt_type="Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): "
+    set /P _qt_type="Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6): "
     set qt_variant=pyside6
     if "!_qt_type!"=="" (
         echo No Qt variant entered, proceeding with default PySide6...
     ) else if !_qt_type!==1 (
-        set qt_variant=pyside6
+        set qt_variant=PySide6
     ) else if !_qt_type!==2 (
-        set qt_variant=pyqt6
-    ) else if !_qt_type!==3 (
-        set qt_variant=pyside2
-    ) else if !_qt_type!==4 (
-        set qt_variant=pyqt5
+        set qt_variant=PyQt6
     ) else (
         echo Invalid Qt variant entered, proceeding with default PySide6...
     )
@@ -169,8 +165,10 @@ if %installation_type%==normal (
         echo No Qt version entered, proceeding with latest version...
     ) else if "!_qt_version!"=="n" (
         echo No Qt version entered, proceeding with latest version...
+    ) else if "!_qt_version!"=="n" (
+        echo No Qt version entered, proceeding with latest version...
     ) else (
-        set qt_version="==!_qt_version!"
+        set qt_version=^=^=!_qt_version!
     )
     :: Remove environment if possible
     set env_name=mnedev_!qt_variant!!qt_version!
