@@ -1,8 +1,10 @@
 :: This batch file creates a mne-environment
-:: You need to specify the path to your conda-root and the path to the script-root, where you store the folders 
-:: of your development version of mne-python, mne-qt-browser, mne-pipeline-hd etc. in a paths.ini file, like this:
+:: You need to specify the path to your conda-root in a paths.ini file, like this:
 :: conda_root=C:\Users\user\Anaconda3
-:: script_root=C:\Users\user\Documents\GitHub\mne-python
+:: 
+:: For development installations, also specify paths to the packages you want to develop:
+:: mne_python_path=C:\Users\user\Code\mne-python
+:: mne_qt_browser_path=C:\Users\user\Code\mne-qt-browser
 
 :: This disables printing every command from the script
 @echo off
@@ -15,21 +17,17 @@ for /f "tokens=1,2 delims==" %%a in (./version.txt) do (
 )
 echo Running mne-python installation script %version% for Windows...
 
-:: Read paths from paths.inis
+:: Read paths from paths.ini
 for /f "tokens=1,2 delims==" %%a in (./paths.ini) do (
     if %%a==conda_root set conda_root=%%b
-    if %%a==script_root set script_root=%%b
 )
 echo Conda-Root: %conda_root%
-echo Script-Root: %script_root%
 
-:: Check if all paths exist
-for %%a in (%conda_root% %script_root%) do (
-    if not exist %%a (
-        echo Path %%a does not exist, exiting...
-        Pause
-        exit 1
-    )
+:: Check if conda path exists
+if not exist %conda_root% (
+    echo Path %conda_root% does not exist, exiting...
+    Pause
+    exit 1
 )
 
 :: Activate Anaconda
@@ -77,24 +75,65 @@ if %installation_type%==normal (
         set _env_name=mne
     )
 
+    :: Get MNE version preference
+    set /P _mne_version="Do you want to install a specific version of mne-python? (<version>/n): "
+    if "!_mne_version!"=="n" (
+        set _mne_core=mne-base
+        set _mne_full=mne
+    ) else if "!_mne_version!"=="" (
+        echo No version entered, proceeding with latest version...
+        set _mne_core=mne-base
+        set _mne_full=mne
+    ) else (
+        set _mne_core=mne-base==!_mne_version!
+        set _mne_full=mne==!_mne_version!
+    )
+
+    :: Get core dependencies preference
+    set /P _core="Do you want to install only core dependencies? (y/n): "
+
+    :: Get cupy preference
+    set /P _install_cupy="Do you want to install CUDA processing with cupy? (y/n): "
+
     :: Remove existing environment if it exists
     echo Removing existing environment !_env_name! if necessary...
     call !solver! env remove -n !_env_name! -y
 
-    :: Create new environment with mne
-    echo Creating environment "!_env_name!" with Python and basic packages...
-    call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip
+    :: Create new environment with MNE
+    echo Creating environment "!_env_name!" with Python and MNE...
+    if "!_core!"=="y" (
+        echo Installing mne-python with core dependencies...
+        if "!_install_cupy!"=="y" (
+            call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_core! cupy
+        ) else (
+            call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_core!
+        )
+    ) else (
+        echo Installing mne-python with all dependencies...
+        if "!_install_cupy!"=="y" (
+            call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_full! cupy
+        ) else (
+            call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! python pip !_mne_full!
+        )
+    )
 
     echo.
-    echo Environment "!_env_name!" has been created successfully!
+    echo Environment "!_env_name!" with MNE has been created successfully!
     echo.
-    echo To complete the installation, please activate the environment and run the installation script:
+    echo To verify the installation, activate the environment and check system info:
     echo.
     echo   conda activate !_env_name!
-    echo   install_mne_normal_win.bat
+    echo   python -c "import mne; mne.sys_info()"
     echo.
 
 ) else (
+    :: Get environment name
+    set /P _env_name="Please enter development environment name: "
+    if "!_env_name!"=="" (
+        echo No environment name entered, proceeding with default name mnedev...
+        set _env_name=mnedev
+    )
+
     :: Get python version
     set python_version=
     set /P _python_version="Do you want to install a specific version of Python? (<version>/n): "
@@ -107,36 +146,8 @@ if %installation_type%==normal (
         echo Python version set to !python_version!.
     )
 
-    :: Get Qt variant for environment name
-    set /P _qt_type="Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): "
-    set qt_variant=pyside6
-    if "!_qt_type!"=="" (
-        echo No Qt variant entered, proceeding with default PySide6...
-    ) else if !_qt_type!==1 (
-        set qt_variant=pyside6
-    ) else if !_qt_type!==2 (
-        set qt_variant=pyqt6
-    ) else if !_qt_type!==3 (
-        set qt_variant=pyside2
-    ) else if !_qt_type!==4 (
-        set qt_variant=pyqt5
-    ) else (
-        echo Invalid Qt variant entered, proceeding with default PySide6...
-    )
-
-    :: Get Qt version for environment name
-    set /P _qt_version="Do you want to install a specific version of Qt? (<version-number>/n): "
-    set qt_version=
-    if "!_qt_version!"=="" (
-        echo No Qt version entered, proceeding with latest version...
-    ) else if "!_qt_version!"=="n" (
-        echo No Qt version entered, proceeding with latest version...
-    ) else (
-        set qt_version===!_qt_version!
-    )
-
     :: Remove environment if possible
-    set env_name=mnedev_!qt_variant!!qt_version!
+    set env_name=!_env_name!
     echo Removing existing environment !env_name! if necessary...
     call !solver! env remove -n !env_name! -y
 

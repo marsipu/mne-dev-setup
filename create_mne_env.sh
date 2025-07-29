@@ -66,24 +66,62 @@ if [[ "$installation_type" == "normal" ]]; then
         _env_name=mne
     fi
 
+    # Get MNE version preference
+    read -p "Do you want to install a specific version of mne-python? (<version>/n): " _mne_version
+    if [[ -z "$_mne_version" || "$_mne_version" == "n" ]]; then
+        _mne_core=mne-base
+        _mne_full=mne
+        echo "No version entered, proceeding with latest version..."
+    else
+        _mne_core=mne-base==$_mne_version
+        _mne_full=mne==$_mne_version
+    fi
+
+    # Get core dependencies preference
+    read -p "Do you want to install only core dependencies? (y/n): " _core
+
+    # Get cupy preference
+    read -p "Do you want to install CUDA processing with cupy? (y/n): " _install_cupy
+
     # Remove existing environment if it exists
     echo "Removing existing environment $_env_name if necessary..."
     $solver env remove -n $_env_name -y
 
-    # Create new environment with basic packages
-    echo "Creating environment \"$_env_name\" with Python and basic packages..."
-    $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip
+    # Create new environment with MNE
+    echo "Creating environment \"$_env_name\" with Python and MNE..."
+    if [[ "$_core" == "y" ]]; then
+        echo "Installing mne-python with core dependencies..."
+        if [[ "$_install_cupy" == "y" ]]; then
+            $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_core cupy
+        else
+            $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_core
+        fi
+    else
+        echo "Installing mne-python with all dependencies..."
+        if [[ "$_install_cupy" == "y" ]]; then
+            $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_full cupy
+        else
+            $solver create --yes --strict-channel-priority --channel=conda-forge --name=$_env_name python pip $_mne_full
+        fi
+    fi
 
     echo
-    echo "Environment \"$_env_name\" has been created successfully!"
+    echo "Environment \"$_env_name\" with MNE has been created successfully!"
     echo
-    echo "To complete the installation, please activate the environment and run the installation script:"
+    echo "To verify the installation, activate the environment and check system info:"
     echo
     echo "  conda activate $_env_name"
-    echo "  ./install_mne_normal_unix.sh"
+    echo "  python -c \"import mne; mne.sys_info()\""
     echo
 
 else
+    # Get environment name
+    read -p "Please enter development environment name: " _env_name
+    if [[ -z "$_env_name" ]]; then
+        echo "No environment name entered, proceeding with default name mnedev..."
+        _env_name=mnedev
+    fi
+
     # Get Python version
     read -p "Do you want to install a specific version of Python? (<version>/n): " _python_version
     python_version=""
@@ -93,33 +131,7 @@ else
         python_version="==$_python_version"
     fi
     
-    # Qt variant selection
-    read -p "Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): " _qt_type
-    qt_variant=pyside6
-    if [[ -z "$_qt_type" ]]; then
-        echo "No Qt variant entered, proceeding with default PySide6..."
-    elif [[ "$_qt_type" == "1" ]]; then
-        qt_variant=pyside6
-    elif [[ "$_qt_type" == "2" ]]; then
-        qt_variant=pyqt6
-    elif [[ "$_qt_type" == "3" ]]; then
-        qt_variant=pyside2
-    elif [[ "$_qt_type" == "4" ]]; then
-        qt_variant=pyqt5
-    else
-        echo "Invalid Qt variant entered, proceeding with default PySide6..."
-    fi
-
-    # Specify Qt version
-    read -p "Do you want to install a specific version of Qt? (<version-number>/n): " _qt_version
-    qt_version=""
-    if [[ -z "$_qt_version" || "$_qt_version" == "n" ]]; then
-        echo "No Qt version entered, proceeding with latest version..."
-    else
-        qt_version==$_qt_version
-    fi
-
-    env_name=mnedev_${qt_variant}${qt_version}
+    env_name=$_env_name
     echo "Removing existing environment $env_name if necessary..."
     $solver env remove -n $env_name -y
     echo "Creating development environment $env_name..."

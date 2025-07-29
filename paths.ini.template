@@ -1,0 +1,33 @@
+# MNE Installation Scripts Configuration
+# Copy this file to paths.ini and update the paths according to your system
+
+# Required: Path to your conda/miniconda installation
+# Examples:
+#   Windows: C:/Users/username/miniconda3 or C:/Users/username/Anaconda3
+#   Linux/Mac: /home/username/miniconda3 or /opt/anaconda3
+conda_root=
+
+# Development package paths
+# These should point to the root directory of each package (containing setup.py or pyproject.toml)
+# Use absolute paths for each package you want to develop
+# Leave empty or comment out packages you don't want to install
+
+# Core MNE packages
+mne_python_path=
+mne_qt_browser_path=
+
+# Additional MNE ecosystem packages
+mne_bids_path=
+mne_bids_pipeline_path=
+mne_connectivity_path=
+mne_features_path=
+mne_nodes_path=
+
+# Example configurations:
+# mne_python_path=C:/Users/username/Code/mne-python
+# mne_qt_browser_path=C:/Users/username/Code/mne-qt-browser
+# mne_bids_path=C:/Users/username/Code/mne-bids
+# mne_bids_pipeline_path=C:/Users/username/Code/mne-bids-pipeline
+# mne_connectivity_path=C:/Users/username/Code/mne-connectivity
+# mne_features_path=C:/Users/username/Code/mne-features
+# mne_nodes_path=C:/Users/username/Code/mne-nodes

@@ -36,14 +36,21 @@ if "%CONDA_DEFAULT_ENV%"=="" (
 
 echo Environment check passed. Proceeding with installation...
 
-:: Read script root from paths.ini
+:: Read paths from paths.ini
 for /f "tokens=1,2 delims==" %%a in (./paths.ini) do (
-    if %%a==script_root set script_root=%%b
+    if %%a==mne_python_path set mne_python_path=%%b
+    if %%a==mne_qt_browser_path set mne_qt_browser_path=%%b
+    if %%a==mne_bids_path set mne_bids_path=%%b
+    if %%a==mne_bids_pipeline_path set mne_bids_pipeline_path=%%b
+    if %%a==mne_connectivity_path set mne_connectivity_path=%%b
+    if %%a==mne_features_path set mne_features_path=%%b
+    if %%a==mne_nodes_path set mne_nodes_path=%%b
 )
-echo Script-Root: %script_root%
+
+echo Package paths loaded from paths.ini
 
 :: Get Qt variant preference
-set /P _qt_type="Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): "
+set /P _qt_type="Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6): "
 set qt_variant=pyside6
 if "!_qt_type!"=="" (
     echo No Qt variant entered, proceeding with default PySide6...
@@ -51,10 +58,6 @@ if "!_qt_type!"=="" (
     set qt_variant=pyside6
 ) else if !_qt_type!==2 (
     set qt_variant=pyqt6
-) else if !_qt_type!==3 (
-    set qt_variant=pyside2
-) else if !_qt_type!==4 (
-    set qt_variant=pyqt5
 ) else (
     echo Invalid Qt variant entered, proceeding with default PySide6...
 )
@@ -75,40 +78,114 @@ echo Installing Qt variant !qt_variant!!qt_version!...
 pip install !qt_variant!!qt_version!
 
 :: Install dev-version of mne-python
-echo Installing development version of mne-python...
-cd /d "%script_root%/mne-python"
-if not exist "%script_root%/mne-python" (
-    echo Error: mne-python directory not found at %script_root%/mne-python
-    echo Please check your script_root path in paths.ini
-    pause
-    exit /b 1
+if defined mne_python_path (
+    echo Installing development version of mne-python...
+    cd /d "!mne_python_path!"
+    if not exist "!mne_python_path!" (
+        echo Error: mne-python directory not found at !mne_python_path!
+        echo Please check your mne_python_path in paths.ini
+        pause
+        exit /b 1
+    )
+    pip install -e .[full-no-qt,test,doc]
+    :: Initialize pre-commit
+    pip install pre-commit
+    pre-commit install
+) else (
+    echo Warning: mne_python_path not specified in paths.ini
+    echo Skipping mne-python development installation...
 )
-pip install -e .[full-no-qt,test,doc]
-
-:: Initialize pre-commit
-pip install pre-commit
-pre-commit install
 
 :: Install dev-version of mne-qt-browser
-echo Installing development version of mne-qt-browser
-cd /d "%script_root%/mne-qt-browser"
-if not exist "%script_root%/mne-qt-browser" (
-    echo Warning: mne-qt-browser directory not found at %script_root%/mne-qt-browser
-    echo Skipping mne-qt-browser installation...
+if defined mne_qt_browser_path (
+    echo Installing development version of mne-qt-browser...
+    cd /d "!mne_qt_browser_path!"
+    if not exist "!mne_qt_browser_path!" (
+        echo Warning: mne-qt-browser directory not found at !mne_qt_browser_path!
+        echo Skipping mne-qt-browser installation...
+    ) else (
+        pip uninstall -y mne_qt_browser
+        pip install -e .[opengl,tests]
+    )
 ) else (
-    pip uninstall -y mne_qt_browser
-    pip install -e .[opengl,tests]
+    echo Warning: mne_qt_browser_path not specified in paths.ini
+    echo Skipping mne-qt-browser installation...
+)
+
+:: Install dev-version of mne-bids
+if defined mne_bids_path (
+    echo Installing development version of mne-bids...
+    cd /d "!mne_bids_path!"
+    if not exist "!mne_bids_path!" (
+        echo Warning: mne-bids directory not found at !mne_bids_path!
+        echo Skipping mne-bids installation...
+    ) else (
+        pip install -e .[full,test,doc]
+    )
+) else (
+    echo Warning: mne_bids_path not specified in paths.ini
+    echo Skipping mne-bids installation...
+)
+
+:: Install dev-version of mne-bids-pipeline
+if defined mne_bids_pipeline_path (
+    echo Installing development version of mne-bids-pipeline...
+    cd /d "!mne_bids_pipeline_path!"
+    if not exist "!mne_bids_pipeline_path!" (
+        echo Warning: mne-bids-pipeline directory not found at !mne_bids_pipeline_path!
+        echo Skipping mne-bids-pipeline installation...
+    ) else (
+        pip install -e .[full,test,doc]
+    )
+) else (
+    echo Warning: mne_bids_pipeline_path not specified in paths.ini
+    echo Skipping mne-bids-pipeline installation...
+)
+
+:: Install dev-version of mne-connectivity
+if defined mne_connectivity_path (
+    echo Installing development version of mne-connectivity...
+    cd /d "!mne_connectivity_path!"
+    if not exist "!mne_connectivity_path!" (
+        echo Warning: mne-connectivity directory not found at !mne_connectivity_path!
+        echo Skipping mne-connectivity installation...
+    ) else (
+        pip install -e .[test,doc]
+    )
+) else (
+    echo Warning: mne_connectivity_path not specified in paths.ini
+    echo Skipping mne-connectivity installation...
+)
+
+:: Install dev-version of mne-features
+if defined mne_features_path (
+    echo Installing development version of mne-features...
+    cd /d "!mne_features_path!"
+    if not exist "!mne_features_path!" (
+        echo Warning: mne-features directory not found at !mne_features_path!
+        echo Skipping mne-features installation...
+    ) else (
+        pip install -e .[test,doc]
+    )
+) else (
+    echo Warning: mne_features_path not specified in paths.ini
+    echo Skipping mne-features installation...
 )
 
 :: Install dev-version of mne-nodes
-echo Installing development version of mne-nodes
-cd /d "%script_root%/mne-nodes"
-if not exist "%script_root%/mne-nodes" (
-    echo Warning: mne-nodes directory not found at %script_root%/mne-nodes
-    echo Skipping mne-nodes installation...
+if defined mne_nodes_path (
+    echo Installing development version of mne-nodes...
+    cd /d "!mne_nodes_path!"
+    if not exist "!mne_nodes_path!" (
+        echo Warning: mne-nodes directory not found at !mne_nodes_path!
+        echo Skipping mne-nodes installation...
+    ) else (
+        pip install -e .[test,docs]
+        pre-commit install
+    )
 ) else (
-    pip install -e .[test,docs]
-    pre-commit install
+    echo Warning: mne_nodes_path not specified in paths.ini
+    echo Skipping mne-nodes installation...
 )
 
 :: Get cupy preference
