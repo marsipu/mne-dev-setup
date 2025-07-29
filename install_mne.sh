@@ -97,7 +97,19 @@ if [[ "$installation_type" == "normal" ]]; then
         $solver create --yes --override-channels --channel=conda-forge --name=$_env_name $_mne_full
     fi
 
+    $solver env list
     source activate $_env_name
+    # Check if environment was activated correctly
+    expected_env="${conda_root//\\//}/envs/$_env_name"
+    actual_env="${CONDA_PREFIX//\\//}"
+    if [[ "$expected_env" == "$actual_env" ]]; then
+        echo "Environment successfully activated."
+    else
+        echo "expected_env: $expected_env"
+        echo "actual_env: $actual_env"
+        echo "Failed to activate environment."
+        exit 1
+    fi
 
 else
     # Get Python version
@@ -139,7 +151,19 @@ else
     $solver env remove -n $env_name -y
     echo Creating development environment $env_name...
     $solver create -n $env_name -y python$python_version
+    $solver env list
     source activate $env_name
+    # Check if environment was activated correctly
+    expected_env="${conda_root//\\//}/envs/$env_name"
+    actual_env="${CONDA_PREFIX//\\//}"
+    if [[ "$expected_env" == "$actual_env" ]]; then
+        echo "Environment successfully activated."
+    else
+        echo "expected_env: $expected_env"
+        echo "actual_env: $actual_env"
+        echo "Failed to activate environment."
+        exit 1
+    fi
     echo Installing Qt variant ${qt_variant}${qt_version}...
     pip install ${qt_variant}${qt_version}
 

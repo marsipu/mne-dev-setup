@@ -108,13 +108,32 @@ if %installation_type%==normal (
 
     if !_core!==y (
         echo Creating environment "!_env_name!" and installing mne-python with core dependencies...
-        call %solver% create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! !_mne_core!
+        call !solver! create --yes --strict-channel-priority --channel=conda-forge --name=!_env_name! !_mne_core!
     ) else (
         echo Creating environment "!_env_name!" and installing mne-python with all dependencies...
-        call %solver% create --yes --override-channels --channel=conda-forge --name=!_env_name! !_mne_full!
+        call !solver! create --yes --override-channels --channel=conda-forge --name=!_env_name! !_mne_full!
     )
     
-    call "%conda_root%\\Scripts\\activate.bat" activate !_env_name!
+    call !solver! env list
+    timeout /t 1 /nobreak >nul
+    :: Debug: Show what we're trying to activate
+    echo Debug: Environment name is: !_env_name!
+    echo Debug: Conda root is: %conda_root%
+    echo Debug: Trying to activate: %conda_root%/envs/!_env_name!
+    :: Try to activate using the full path method (same as test_activate.bat)
+    call %conda_root%/Scripts/activate.bat %conda_root%/envs/!_env_name!
+    :: Check if environment was activated correctly
+    set expected_env=%conda_root:\=/%/envs/!_env_name!
+    set actual_env=%CONDA_PREFIX:\=/%
+    echo Debug: Expected: !expected_env!
+    echo Debug: Actual: !actual_env!
+    if "!expected_env!"=="!actual_env!" (
+        echo Environment successfully activated.
+    ) else (
+        echo Failed to activate environment.
+        Pause
+        exit /b
+    ) 
 
 ) else (
     :: Get python version
@@ -156,11 +175,31 @@ if %installation_type%==normal (
     :: Remove environment if possible
     set env_name=mnedev_!qt_variant!!qt_version!
     echo Removing existing environment !env_name! if necessary...
-    call %solver% env remove -n !env_name! -y
+    call !solver! env remove -n !env_name! -y
     :: Create new environment
     echo Creating development environment !env_name!...
-    call %solver% create -n !env_name! -y python!python_version!
-    call "%conda_root%\\Scripts\\activate.bat" activate !env_name!
+    call !solver! create -n !env_name! -y python!python_version!
+    call !solver! env list
+    timeout /t 1 /nobreak >nul
+    :: Debug: Show what we're trying to activate
+    echo Debug: Environment name is: !env_name!
+    echo Debug: Conda root is: %conda_root%
+    echo Debug: Trying to activate: %conda_root%/envs/!env_name!
+    :: Try to activate using the full path method (same as test_activate.bat)
+    call %conda_root%/Scripts/activate.bat %conda_root%/envs/!env_name!
+    call !solver! env list
+    :: Check if environment was activated correctly
+    set expected_env=%conda_root:\=/%/envs/!env_name!
+    set actual_env=%CONDA_PREFIX:\=/%
+    echo Debug: Expected: !expected_env!
+    echo Debug: Actual: !actual_env!
+    if "!expected_env!"=="!actual_env!" (
+        echo Environment successfully activated.
+    ) else (
+        echo Failed to activate environment.
+        Pause
+        exit /b
+    )
     :: Installing Qt
     echo Installing Qt variant !qt_variant!!qt_version!...
     call pip install !qt_variant!!qt_version!
@@ -193,4 +232,3 @@ if "%install_cupy%"=="y" (
 call mne sys_info
 
 Pause
-exit 0
