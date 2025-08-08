@@ -14,6 +14,10 @@ source ./version.txt
 echo Running mne-python installation script $version for MacOs/Linux...
 
 # Read paths from paths.ini
+if [ ! -f paths.ini ]; then
+    echo "paths.ini not found. Please create paths.ini with the required paths. You can copy template-paths.ini for reference."
+    exit 1
+fi
 source ./paths.ini
 echo Conda-Root: $conda_root
 

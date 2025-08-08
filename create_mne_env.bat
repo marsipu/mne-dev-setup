@@ -18,6 +18,11 @@ for /f "tokens=1,2 delims==" %%a in (./version.txt) do (
 echo Running mne-python installation script %version% for Windows...
 
 :: Read paths from paths.ini
+if not exist paths.ini (
+    echo paths.ini not found. Please create paths.ini with the required paths. You can copy template-paths.ini for reference.
+    Pause
+    exit 1
+)
 for /f "tokens=1,2 delims==" %%a in (./paths.ini) do (
     if %%a==conda_root set conda_root=%%b
 )
