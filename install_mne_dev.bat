@@ -50,17 +50,22 @@ for /f "tokens=1,2 delims==" %%a in (./paths.ini) do (
 echo Package paths loaded from paths.ini
 
 :: Get Qt variant preference
-set /P _qt_type="Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6): "
-set qt_variant=pyside6
+set /P _qt_type="Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): "
+set qt_variant=PySide6
 if "!_qt_type!"=="" (
     echo No Qt variant entered, proceeding with default PySide6...
 ) else if !_qt_type!==1 (
-    set qt_variant=pyside6
+    set qt_variant=PySide6
 ) else if !_qt_type!==2 (
-    set qt_variant=pyqt6
+    set qt_variant=PyQt6
+) else if !_qt_type!==3 (
+    set qt_variant=PySide2
+) else if !_qt_type!==4 (
+    set qt_variant=PyQt5
 ) else (
     echo Invalid Qt variant entered, proceeding with default PySide6...
 )
+echo Selected Qt variant: !qt_variant!
 
 :: Get Qt version preference
 set /P _qt_version="Do you want to install a specific version of Qt? (<version-number>/n): "
@@ -71,6 +76,7 @@ if "!_qt_version!"=="" (
     echo No Qt version entered, proceeding with latest version...
 ) else (
     set qt_version===!_qt_version!
+    echo Selected Qt version: !qt_version!
 )
 
 :: Installing Qt

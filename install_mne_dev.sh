@@ -39,17 +39,22 @@ source ./paths.ini
 echo "Package paths loaded from paths.ini"
 
 # Get Qt variant preference
-read -p "Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6): " _qt_type
-qt_variant=pyside6
+read -p "Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): " _qt_type
+qt_variant=PySide6  # Default to PySide6
 if [[ -z "$_qt_type" ]]; then
     echo "No Qt variant entered, proceeding with default PySide6..."
 elif [[ "$_qt_type" == "1" ]]; then
-    qt_variant=pyside6
+    qt_variant=PySide6
 elif [[ "$_qt_type" == "2" ]]; then
-    qt_variant=pyqt6
+    qt_variant=PyQt6
+elif [[ "$_qt_type" == "3" ]]; then
+    qt_variant=PySide2
+elif [[ "$_qt_type" == "4" ]]; then
+    qt_variant=PyQt5
 else
     echo "Invalid Qt variant entered, proceeding with default PySide6..."
 fi
+echo "Selected Qt variant: $qt_variant"
 
 # Get Qt version preference
 read -p "Do you want to install a specific version of Qt? (<version-number>/n): " _qt_version
@@ -58,6 +63,7 @@ if [[ -z "$_qt_version" || "$_qt_version" == "n" ]]; then
     echo "No Qt version entered, proceeding with latest version..."
 else
     qt_version==$_qt_version
+    echo "Selected Qt version: $qt_version"
 fi
 
 # Installing Qt
