@@ -1,4 +1,4 @@
-# MNE Installation Scripts Configuration
+# MNE Development Setup
 
 ## Overview
 
