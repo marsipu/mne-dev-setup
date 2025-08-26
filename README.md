@@ -57,9 +57,9 @@ mne_nodes_path=C:/Users/user/Code/mne-nodes
 ### Supported Packages
 - **mne-python**: Core MNE library with `[full-no-qt,test,doc]` extras
 - **mne-qt-browser**: GUI browser with `[opengl,tests]` extras
-- **mne-nodes**: Node-based processing with `[test,docs]` extras
 - **mne-connectivity**: Connectivity analysis with `[test,docs]` extras
 - **mne-features**: Feature extraction with `[test,docs]` extras
+- **mne-nodes**: Node-based processing with `[test,docs]` extras
 
 ### Pre-commit Hooks
 For packages that support it, pre-commit hooks are automatically installed to ensure code quality.
