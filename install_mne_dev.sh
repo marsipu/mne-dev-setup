@@ -71,114 +71,99 @@ echo "Installing Qt variant ${qt_variant}${qt_version}..."
 pip install ${qt_variant}${qt_version}
 
 # Install dev-version of mne-python
-if [[ -n "$mne_python_path" ]]; then
+if [[ -z "$mne_python_path" ]]; then
+    echo "Warning: mne_python_path not specified in paths.ini"
+    echo "Skipping mne-python development installation..."
+elif [[ ! -d "$mne_python_path" ]]; then
+    echo "Warning: mne-python directory not found at $mne_python_path"
+    echo "Skipping mne-python development installation..."
+else
     echo "Installing development version of mne-python..."
-    if [[ ! -d "$mne_python_path" ]]; then
-        echo "Error: mne-python directory not found at $mne_python_path"
-        echo "Please check your mne_python_path in paths.ini"
-        exit 1
-    fi
     cd "$mne_python_path" || exit
     pip install -e .[full-no-qt,test,doc]
-    
     # Initialize pre-commit
     pip install pre-commit
     pre-commit install
-else
-    echo "Warning: mne_python_path not specified in paths.ini"
-    echo "Skipping mne-python development installation..."
 fi
 
 # Install dev-version of mne-qt-browser
-if [[ -n "$mne_qt_browser_path" ]]; then
-    echo "Installing development version of mne-qt-browser..."
-    if [[ ! -d "$mne_qt_browser_path" ]]; then
-        echo "Warning: mne-qt-browser directory not found at $mne_qt_browser_path"
-        echo "Skipping mne-qt-browser installation..."
-    else
-        cd "$mne_qt_browser_path" || exit
-        pip uninstall -y mne_qt_browser
-        pip install -e .[opengl,tests]
-    fi
-else
+if [[ -z "$mne_qt_browser_path" ]]; then
     echo "Warning: mne_qt_browser_path not specified in paths.ini"
     echo "Skipping mne-qt-browser installation..."
+elif [[ ! -d "$mne_qt_browser_path" ]]; then
+    echo "Warning: mne-qt-browser directory not found at $mne_qt_browser_path"
+    echo "Skipping mne-qt-browser installation..."
+else
+    echo "Installing development version of mne-qt-browser..."
+    cd "$mne_qt_browser_path" || exit
+    pip uninstall -y mne_qt_browser
+    pip install -e .[opengl,tests]
 fi
 
 # Install dev-version of mne-bids
-if [[ -n "$mne_bids_path" ]]; then
-    echo "Installing development version of mne-bids..."
-    if [[ ! -d "$mne_bids_path" ]]; then
-        echo "Warning: mne-bids directory not found at $mne_bids_path"
-        echo "Skipping mne-bids installation..."
-    else
-        cd "$mne_bids_path" || exit
-        pip install -e .[full,test,doc]
-    fi
-else
+if [[ -z "$mne_bids_path" ]]; then
     echo "Warning: mne_bids_path not specified in paths.ini"
     echo "Skipping mne-bids installation..."
+elif [[ ! -d "$mne_bids_path" ]]; then
+    echo "Warning: mne-bids directory not found at $mne_bids_path"
+    echo "Skipping mne-bids installation..."
+else
+    echo "Installing development version of mne-bids..."
+    cd "$mne_bids_path" || exit
+    pip install -e .[full,test,doc]
 fi
 
 # Install dev-version of mne-bids-pipeline
-if [[ -n "$mne_bids_pipeline_path" ]]; then
-    echo "Installing development version of mne-bids-pipeline..."
-    if [[ ! -d "$mne_bids_pipeline_path" ]]; then
-        echo "Warning: mne-bids-pipeline directory not found at $mne_bids_pipeline_path"
-        echo "Skipping mne-bids-pipeline installation..."
-    else
-        cd "$mne_bids_pipeline_path" || exit
-        pip install -e .[full,test,doc]
-    fi
-else
+if [[ -z "$mne_bids_pipeline_path" ]]; then
     echo "Warning: mne_bids_pipeline_path not specified in paths.ini"
     echo "Skipping mne-bids-pipeline installation..."
+elif [[ ! -d "$mne_bids_pipeline_path" ]]; then
+    echo "Warning: mne-bids-pipeline directory not found at $mne_bids_pipeline_path"
+    echo "Skipping mne-bids-pipeline installation..."
+else
+    echo "Installing development version of mne-bids-pipeline..."
+    cd "$mne_bids_pipeline_path" || exit
+    pip install -e .[full,test,doc]
 fi
 
 # Install dev-version of mne-connectivity
-if [[ -n "$mne_connectivity_path" ]]; then
-    echo "Installing development version of mne-connectivity..."
-    if [[ ! -d "$mne_connectivity_path" ]]; then
-        echo "Warning: mne-connectivity directory not found at $mne_connectivity_path"
-        echo "Skipping mne-connectivity installation..."
-    else
-        cd "$mne_connectivity_path" || exit
-        pip install -e .[test,doc]
-    fi
-else
+if [[ -z "$mne_connectivity_path" ]]; then
     echo "Warning: mne_connectivity_path not specified in paths.ini"
     echo "Skipping mne-connectivity installation..."
+elif [[ ! -d "$mne_connectivity_path" ]]; then
+    echo "Warning: mne-connectivity directory not found at $mne_connectivity_path"
+    echo "Skipping mne-connectivity installation..."
+else
+    echo "Installing development version of mne-connectivity..."
+    cd "$mne_connectivity_path" || exit
+    pip install -e .[test,doc]
 fi
 
 # Install dev-version of mne-features
-if [[ -n "$mne_features_path" ]]; then
-    echo "Installing development version of mne-features..."
-    if [[ ! -d "$mne_features_path" ]]; then
-        echo "Warning: mne-features directory not found at $mne_features_path"
-        echo "Skipping mne-features installation..."
-    else
-        cd "$mne_features_path" || exit
-        pip install -e .[test,doc]
-    fi
-else
+if [[ -z "$mne_features_path" ]]; then
     echo "Warning: mne_features_path not specified in paths.ini"
     echo "Skipping mne-features installation..."
+elif [[ ! -d "$mne_features_path" ]]; then
+    echo "Warning: mne-features directory not found at $mne_features_path"
+    echo "Skipping mne-features installation..."
+else
+    echo "Installing development version of mne-features..."
+    cd "$mne_features_path" || exit
+    pip install -e .[test,doc]
 fi
 
 # Install dev-version of mne-nodes
-if [[ -n "$mne_nodes_path" ]]; then
-    echo "Installing development version of mne-nodes..."
-    if [[ ! -d "$mne_nodes_path" ]]; then
-        echo "Warning: mne-nodes directory not found at $mne_nodes_path"
-        echo "Skipping mne-nodes installation..."
-    else
-        cd "$mne_nodes_path" || exit
-        pip install -e .[test,docs]
-        pre-commit install
-    fi
-else
+if [[ -z "$mne_nodes_path" ]]; then
     echo "Warning: mne_nodes_path not specified in paths.ini"
     echo "Skipping mne-nodes installation..."
+elif [[ ! -d "$mne_nodes_path" ]]; then
+    echo "Warning: mne-nodes directory not found at $mne_nodes_path"
+    echo "Skipping mne-nodes installation..."
+else
+    echo "Installing development version of mne-nodes..."
+    cd "$mne_nodes_path" || exit
+    pip install -e .[test,docs]
+    pre-commit install
 fi
 
 echo "Development installation completed successfully!"
