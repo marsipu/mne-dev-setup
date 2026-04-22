@@ -179,6 +179,10 @@ if not defined mne_nodes_path (
     pre-commit install
 )
 
+:: Install IPython
+echo Installing IPython for enhanced interactive experience...
+pip install ipython
+
 echo Development installation completed successfully!
 echo.
 echo Printing System-Info:
