@@ -162,7 +162,7 @@ elif [[ ! -d "$mne_nodes_path" ]]; then
 else
     echo "Installing development version of mne-nodes..."
     cd "$mne_nodes_path" || exit
-    pip install -e .[test,docs]
+    pip install -e .[test,docs,plugins]
     pre-commit install
 fi
 
