@@ -33,6 +33,7 @@ mne_nodes_path=C:/Users/user/Code/mne-nodes
 - **Valid paths**: Only packages with valid paths will be installed in development mode with `pip install -e`
 
 ## Usage
+> **Note:** On a first time conda-installation, you need to create any environment with `conda create -n <env-name> once to accept terms and services.
 
 ### Windows
 
