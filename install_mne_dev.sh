@@ -1,42 +1,47 @@
 #!/bin/bash
-# This script runs inside an activated conda environment for development MNE installation
+# Installs development packages in an existing conda environment.
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ ! -f "$script_dir/paths.ini" ]]; then
+    echo "ERROR: paths.ini not found beside this script."
+    exit 1
+fi
+if ! source "$script_dir/paths.ini"; then
+    echo "ERROR: Could not load paths.ini."
+    exit 1
+fi
+echo "Package paths loaded from paths.ini"
 
-echo "Running development MNE installation inside activated environment..."
+target_env="${1:-}"
+if [[ -n "$target_env" || -z "$CONDA_DEFAULT_ENV" || "$CONDA_DEFAULT_ENV" == "base" || -z "$CONDA_PREFIX" ]]; then
+    if [[ -z "$target_env" ]]; then
+        if ! read -r -p "Development environment name or full path [mnedev]: " target_env; then
+            echo "ERROR: Cannot read an environment name. Run in a terminal or pass it as the first argument."
+            exit 1
+        fi
+        target_env="${target_env:-mnedev}"
+    fi
+    if [[ -z "$conda_root" || ! -f "$conda_root/etc/profile.d/conda.sh" ]]; then
+        echo "ERROR: Set conda_root in paths.ini to a conda installation containing etc/profile.d/conda.sh."
+        exit 1
+    fi
+    if ! source "$conda_root/etc/profile.d/conda.sh"; then
+        echo "ERROR: Could not initialize conda."
+        exit 1
+    fi
+    if ! conda activate "$target_env"; then
+        echo "ERROR: Could not activate conda environment '$target_env'."
+        exit 1
+    fi
+fi
+
+if [[ -z "$CONDA_DEFAULT_ENV" || "$CONDA_DEFAULT_ENV" == "base" || -z "$CONDA_PREFIX" || ! -x "$CONDA_PREFIX/bin/python" ]]; then
+    echo "ERROR: A non-base conda environment with Python must be activated before installing."
+    exit 1
+fi
+env_python="$CONDA_PREFIX/bin/python"
+echo "Running development MNE installation..."
 echo "Current environment: $CONDA_DEFAULT_ENV"
 echo "Environment path: $CONDA_PREFIX"
-
-# Check if we're in the base environment
-if [[ "$CONDA_DEFAULT_ENV" == "base" ]]; then
-    echo
-    echo "ERROR: You are currently in the base environment!"
-    echo "This script should be run in the MNE development environment you created."
-    echo
-    echo "Please activate your MNE development environment first:"
-    echo "  conda activate <your-environment-name>"
-    echo
-    echo "Then run this script again."
-    exit 1
-fi
-
-# Check if CONDA_DEFAULT_ENV is empty (not in any conda environment)
-if [[ -z "$CONDA_DEFAULT_ENV" ]]; then
-    echo
-    echo "ERROR: No conda environment is currently activated!"
-    echo "This script should be run in the MNE development environment you created."
-    echo
-    echo "Please activate your MNE development environment first:"
-    echo "  conda activate <your-environment-name>"
-    echo
-    echo "Then run this script again."
-    exit 1
-fi
-
-echo "Environment check passed. Proceeding with installation..."
-
-# Read paths from paths.ini
-source ./paths.ini
-
-echo "Package paths loaded from paths.ini"
 
 # Get Qt variant preference
 read -p "Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): " _qt_type
@@ -68,7 +73,7 @@ fi
 
 # Installing Qt
 echo "Installing Qt variant ${qt_variant}${qt_version}..."
-pip install ${qt_variant}${qt_version}
+"$env_python" -m pip install "${qt_variant}${qt_version}"
 
 # Install dev-version of mne-python
 if [[ -z "$mne_python_path" ]]; then
@@ -80,10 +85,10 @@ elif [[ ! -d "$mne_python_path" ]]; then
 else
     echo "Installing development version of mne-python..."
     cd "$mne_python_path" || exit
-    pip install -e .[full-no-qt,test,doc]
+    "$env_python" -m pip install -e ".[full-no-qt,test,doc]"
     # Initialize pre-commit
-    pip install pre-commit
-    pre-commit install
+    "$env_python" -m pip install pre-commit
+    "$env_python" -m pre_commit install
 fi
 
 # Install dev-version of mne-qt-browser
@@ -96,8 +101,8 @@ elif [[ ! -d "$mne_qt_browser_path" ]]; then
 else
     echo "Installing development version of mne-qt-browser..."
     cd "$mne_qt_browser_path" || exit
-    pip uninstall -y mne_qt_browser
-    pip install -e .[opengl,tests]
+    "$env_python" -m pip uninstall -y mne_qt_browser
+    "$env_python" -m pip install -e ".[opengl,tests]"
 fi
 
 # Install dev-version of mne-bids
@@ -110,7 +115,7 @@ elif [[ ! -d "$mne_bids_path" ]]; then
 else
     echo "Installing development version of mne-bids..."
     cd "$mne_bids_path" || exit
-    pip install -e .[full,test,doc]
+    "$env_python" -m pip install -e ".[full,test,doc]"
 fi
 
 # Install dev-version of mne-bids-pipeline
@@ -123,7 +128,7 @@ elif [[ ! -d "$mne_bids_pipeline_path" ]]; then
 else
     echo "Installing development version of mne-bids-pipeline..."
     cd "$mne_bids_pipeline_path" || exit
-    pip install -e .[full,test,doc]
+    "$env_python" -m pip install -e ".[full,test,doc]"
 fi
 
 # Install dev-version of mne-connectivity
@@ -136,7 +141,7 @@ elif [[ ! -d "$mne_connectivity_path" ]]; then
 else
     echo "Installing development version of mne-connectivity..."
     cd "$mne_connectivity_path" || exit
-    pip install -e .[test,doc]
+    "$env_python" -m pip install -e ".[test,doc]"
 fi
 
 # Install dev-version of mne-features
@@ -149,7 +154,7 @@ elif [[ ! -d "$mne_features_path" ]]; then
 else
     echo "Installing development version of mne-features..."
     cd "$mne_features_path" || exit
-    pip install -e .[test,doc]
+    "$env_python" -m pip install -e ".[test,doc]"
 fi
 
 # Install dev-version of mne-nodes
@@ -162,15 +167,15 @@ elif [[ ! -d "$mne_nodes_path" ]]; then
 else
     echo "Installing development version of mne-nodes..."
     cd "$mne_nodes_path" || exit
-    pip install -e .[test,docs,plugins]
-    pre-commit install
+    "$env_python" -m pip install -e ".[test,docs,plugins]"
+    "$env_python" -m pre_commit install
 fi
 
 # Install IPython
 echo "Installing IPython for enhanced interactive experience..."
-pip install ipython
+"$env_python" -m pip install ipython
 
 echo "Development installation completed successfully!"
 echo
 echo "Printing System-Info:"
-python -c "import mne; mne.sys_info()"
+"$env_python" -c "import mne; mne.sys_info()"

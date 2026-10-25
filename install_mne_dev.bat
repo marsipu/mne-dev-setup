@@ -1,53 +1,67 @@
-:: This script runs inside an activated conda environment for development MNE installation
+:: Installs development packages in an existing conda environment.
 @echo off
 setlocal enabledelayedexpansion
 
-echo Running development MNE installation inside activated environment...
-echo Current environment: %CONDA_DEFAULT_ENV%
-echo Environment path: %CONDA_PREFIX%
-
-:: Check if we're in the base environment
-if "%CONDA_DEFAULT_ENV%"=="base" (
-    echo.
-    echo ERROR: You are currently in the base environment!
-    echo This script should be run in the MNE development environment you created.
-    echo.
-    echo Please activate your MNE development environment first:
-    echo   conda activate ^<your-environment-name^>
-    echo.
-    echo Then run this script again.
+set "script_dir=%~dp0"
+if not exist "%script_dir%paths.ini" (
+    echo ERROR: paths.ini not found beside this script.
     pause
     exit /b 1
 )
-
-:: Check if CONDA_DEFAULT_ENV is empty (not in any conda environment)
-if "%CONDA_DEFAULT_ENV%"=="" (
-    echo.
-    echo ERROR: No conda environment is currently activated!
-    echo This script should be run in the MNE development environment you created.
-    echo.
-    echo Please activate your MNE development environment first:
-    echo   conda activate ^<your-environment-name^>
-    echo.
-    echo Then run this script again.
-    pause
-    exit /b 1
-)
-
-echo Environment check passed. Proceeding with installation...
 
 :: Read paths from paths.ini
-for /f "tokens=1,2 delims==" %%a in (./paths.ini) do (
-    if %%a==mne_python_path set mne_python_path=%%b
-    if %%a==mne_qt_browser_path set mne_qt_browser_path=%%b
-    if %%a==mne_bids_path set mne_bids_path=%%b
-    if %%a==mne_bids_pipeline_path set mne_bids_pipeline_path=%%b
-    if %%a==mne_connectivity_path set mne_connectivity_path=%%b
-    if %%a==mne_features_path set mne_features_path=%%b
-    if %%a==mne_nodes_path set mne_nodes_path=%%b
+set "conda_root="
+for /f "usebackq eol=# tokens=1,* delims==" %%a in ("%script_dir%paths.ini") do (
+    if "%%a"=="conda_root" set "conda_root=%%b"
+    if "%%a"=="mne_python_path" set "mne_python_path=%%b"
+    if "%%a"=="mne_qt_browser_path" set "mne_qt_browser_path=%%b"
+    if "%%a"=="mne_bids_path" set "mne_bids_path=%%b"
+    if "%%a"=="mne_bids_pipeline_path" set "mne_bids_pipeline_path=%%b"
+    if "%%a"=="mne_connectivity_path" set "mne_connectivity_path=%%b"
+    if "%%a"=="mne_features_path" set "mne_features_path=%%b"
+    if "%%a"=="mne_nodes_path" set "mne_nodes_path=%%b"
 )
 
 echo Package paths loaded from paths.ini
+
+set "target_env=%~1"
+if defined target_env goto :activate_environment
+if not defined CONDA_DEFAULT_ENV goto :choose_environment
+if /i "%CONDA_DEFAULT_ENV%"=="base" goto :choose_environment
+if not defined CONDA_PREFIX goto :choose_environment
+goto :environment_ready
+
+:choose_environment
+set /p "target_env=Development environment name or full path [mnedev]: "
+if not defined target_env set "target_env=mnedev"
+
+:activate_environment
+if not defined conda_root (
+    echo ERROR: Set conda_root in paths.ini to activate a conda environment.
+    pause
+    exit /b 1
+)
+if not exist "%conda_root%\Scripts\activate.bat" (
+    echo ERROR: Conda activation script not found at "%conda_root%\Scripts\activate.bat".
+    pause
+    exit /b 1
+)
+call "%conda_root%\Scripts\activate.bat" "%target_env%"
+if errorlevel 1 (
+    echo ERROR: Could not activate conda environment "%target_env%".
+    pause
+    exit /b 1
+)
+
+:environment_ready
+if not defined CONDA_DEFAULT_ENV goto :invalid_environment
+if /i "%CONDA_DEFAULT_ENV%"=="base" goto :invalid_environment
+if not defined CONDA_PREFIX goto :invalid_environment
+if not exist "%CONDA_PREFIX%\python.exe" goto :invalid_environment
+set "env_python=%CONDA_PREFIX%\python.exe"
+echo Running development MNE installation...
+echo Current environment: %CONDA_DEFAULT_ENV%
+echo Environment path: %CONDA_PREFIX%
 
 :: Get Qt variant preference
 set /P _qt_type="Which Qt variant do you want to use? (1: PySide6 / 2: PyQt6 / 3: PySide2 / 4: PyQt5): "
@@ -81,7 +95,7 @@ if "!_qt_version!"=="" (
 
 :: Installing Qt
 echo Installing Qt variant !qt_variant!!qt_version!...
-pip install !qt_variant!!qt_version!
+"%env_python%" -m pip install !qt_variant!!qt_version!
 
 :: Install dev-version of mne-python
 if not defined mne_python_path (
@@ -93,10 +107,10 @@ if not defined mne_python_path (
 ) else (
     echo Installing development version of mne-python...
     cd /d "!mne_python_path!"
-    pip install -e .[full-no-qt,test,doc]
+    "%env_python%" -m pip install -e .[full-no-qt,test,doc]
     :: Initialize pre-commit
-    pip install pre-commit
-    pre-commit install
+    "%env_python%" -m pip install pre-commit
+    "%env_python%" -m pre_commit install
 )
 
 :: Install dev-version of mne-qt-browser
@@ -109,8 +123,8 @@ if not defined mne_qt_browser_path (
 ) else (
     echo Installing development version of mne-qt-browser...
     cd /d "!mne_qt_browser_path!"
-    pip uninstall -y mne_qt_browser
-    pip install -e .[opengl,tests]
+    "%env_python%" -m pip uninstall -y mne_qt_browser
+    "%env_python%" -m pip install -e .[opengl,tests]
 )
 
 :: Install dev-version of mne-bids
@@ -123,7 +137,7 @@ if not defined mne_bids_path (
 ) else (
     echo Installing development version of mne-bids...
     cd /d "!mne_bids_path!"
-    pip install -e .[full,test,doc]
+    "%env_python%" -m pip install -e .[full,test,doc]
 )
 
 :: Install dev-version of mne-bids-pipeline
@@ -136,7 +150,7 @@ if not defined mne_bids_pipeline_path (
 ) else (
     echo Installing development version of mne-bids-pipeline...
     cd /d "!mne_bids_pipeline_path!"
-    pip install -e .[full,test,doc]
+    "%env_python%" -m pip install -e .[full,test,doc]
 )
 
 :: Install dev-version of mne-connectivity
@@ -149,7 +163,7 @@ if not defined mne_connectivity_path (
 ) else (
     echo Installing development version of mne-connectivity...
     cd /d "!mne_connectivity_path!"
-    pip install -e .[test,doc]
+    "%env_python%" -m pip install -e .[test,doc]
 )
 
 :: Install dev-version of mne-features
@@ -162,7 +176,7 @@ if not defined mne_features_path (
 ) else (
     echo Installing development version of mne-features...
     cd /d "!mne_features_path!"
-    pip install -e .[test,doc]
+    "%env_python%" -m pip install -e .[test,doc]
 )
 
 :: Install dev-version of mne-nodes
@@ -175,17 +189,23 @@ if not defined mne_nodes_path (
 ) else (
     echo Installing development version of mne-nodes...
     cd /d "!mne_nodes_path!"
-    pip install -e .[test,docs,plugins]
-    pre-commit install
+    "%env_python%" -m pip install -e .[test,docs,plugins]
+    "%env_python%" -m pre_commit install
 )
 
 :: Install IPython
 echo Installing IPython for enhanced interactive experience...
-pip install ipython
+"%env_python%" -m pip install ipython
 
 echo Development installation completed successfully!
 echo.
 echo Printing System-Info:
-python -c "import mne; mne.sys_info()"
+"%env_python%" -c "import mne; mne.sys_info()"
 
 pause
+exit /b 0
+
+:invalid_environment
+echo ERROR: A non-base conda environment with Python must be activated before installing.
+pause
+exit /b 1

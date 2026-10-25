@@ -38,20 +38,42 @@ mne_nodes_path=C:/Users/user/Code/mne-nodes
 ### Windows
 
 1. **Create environment**: Run `create_mne_env.bat`
-2. **Activate environment**: `conda activate <environment-name>`
-3. **Install packages**: 
-   - Normal installation: `install_mne_normal_win.bat`
-   - Development installation: `install_mne_dev_win.bat`
+2. **Install development packages**: Run or double-click `install_mne_dev.bat`. If no non-base environment is active, it prompts for an existing environment name or full path (default: `mnedev`) and activates it. Alternatively, run `install_mne_dev.bat <environment-name>`.
+
+The creation script initializes conda using `conda_root` in `paths.ini` and prompts for the environment to create. No environment needs to be activated beforehand. For a normal installation, choose the normal-installation option in the creation script.
 
 ### Linux/macOS
 
-**Important**: Shell scripts must be run with the `-i` flag to properly source `.bashrc`:
+These scripts initialize conda from `conda_root` in `paths.ini`; `bash -i` and a previously activated environment are not required:
 
-1. **Create environment**: Run `bash -i create_mne_env.sh`
-2. **Activate environment**: `conda activate <environment-name>`
-3. **Install packages**:
-   - Normal installation: `bash -i install_mne_normal_unix.sh`
-   - Development installation: `bash -i install_mne_dev_unix.sh`
+1. **Create environment**: Run `bash create_mne_env.sh` and enter the environment to create.
+2. **Install development packages**: Run `bash install_mne_dev.sh`. It reuses an active non-base environment or prompts for an existing environment name or full path (default: `mnedev`). Alternatively, run `bash install_mne_dev.sh <environment-name>`.
+
+The installation scripts use the selected environment's Python for pip and pre-commit. Activation failures stop installation before any packages are changed. Both platforms read configuration beside the scripts, independent of the launch directory.
+
+**Warning:** The creation scripts remove an existing environment with the chosen name before recreating it. To install or update packages in an existing environment, use the installation or update scripts instead.
+
+### Updating development repositories
+
+To update all repositories from `paths.ini` and renew their editable installations:
+- Windows: Run `update_mne_dev.bat`. It reuses an active non-base conda environment; otherwise it prompts for an environment name or full path (default: `mnedev`) and activates it using `conda_root` from `paths.ini`. You can also select an environment explicitly with `update_mne_dev.bat my-environment`. Activation failures stop the update before any repositories are changed. Editable installations use that environment's Python.
+- Linux/macOS: Run `bash update_mne_dev.sh`. Like the Windows updater, it reuses an active non-base environment or prompts for an environment name or full path (default: `mnedev`). It initializes conda from `conda_root/etc/profile.d/conda.sh`, so `bash -i` is not required for this script. You can also pass an environment explicitly: `bash update_mne_dev.sh my-environment`. Activation failures stop the update before any repositories are changed, and editable installations use the selected environment's Python.
+
+**Launching by double-click:**
+- Windows: Double-click `update_mne_dev.bat`. The console prompts for the environment when needed and stays open at the end.
+- Linux: Mark `update_mne_dev.sh` as executable (`chmod +x update_mne_dev.sh`) and select **Run in Terminal** if your file manager supports it. Opening it in an editor will not run it.
+- macOS: `.sh` files do not reliably launch in Terminal on double-click. Run `bash update_mne_dev.sh` from Terminal instead.
+
+The same launch behavior applies to the creation and installation scripts: Windows batch files open a console and pause at the end; Linux shell scripts need **Run in Terminal**, and macOS shell scripts should be run from Terminal.
+
+Shell scripts need terminal input for interactive prompts; they do not create a terminal window themselves. For the installation and update scripts, passing an environment as the first argument skips the environment-selection prompt (the installer still prompts for Qt preferences). Shell configuration values containing spaces must be quoted, for example `conda_root="/home/user/My Conda"`.
+
+For each repository the script:
+1. Fetches all remotes (`git fetch --all --prune`)
+2. Merges the default branch of the `upstream` remote (or `origin` if there is no `upstream`) into the currently checked-out branch. Uncommitted changes are stashed and restored automatically (`--autostash`). If a merge conflict occurs, the merge is aborted and reported.
+3. Reinstalls the package in editable mode (`pip install -e .[extras]`) with the same extras as the development installation
+
+At the end, the script lists any repositories that had problems.
 
 ## Development Package Details
 

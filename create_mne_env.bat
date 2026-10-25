@@ -10,33 +10,49 @@
 @echo off
 :: This is necessary to allow setting variables inside if-blocks
 setlocal enabledelayedexpansion
+set "script_dir=%~dp0"
 
 :: Read version
-for /f "tokens=1,2 delims==" %%a in (./version.txt) do (
-    if %%a==version set version=%%b
+if not exist "%script_dir%version.txt" (
+    echo ERROR: version.txt not found beside this script.
+    pause
+    exit /b 1
+)
+for /f "usebackq tokens=1,* delims==" %%a in ("%script_dir%version.txt") do (
+    if "%%a"=="version" set "version=%%b"
 )
 echo Running mne-python installation script %version% for Windows...
 
 :: Read paths from paths.ini
-if not exist paths.ini (
+if not exist "%script_dir%paths.ini" (
     echo paths.ini not found. Please create paths.ini with the required paths. You can copy template-paths.ini for reference.
     Pause
-    exit 1
+    exit /b 1
 )
-for /f "tokens=1,2 delims==" %%a in (./paths.ini) do (
-    if %%a==conda_root set conda_root=%%b
+set "conda_root="
+for /f "usebackq eol=# tokens=1,* delims==" %%a in ("%script_dir%paths.ini") do (
+    if "%%a"=="conda_root" set "conda_root=%%b"
 )
 echo Conda-Root: %conda_root%
 
-:: Check if conda path exists
-if not exist %conda_root% (
-    echo Path %conda_root% does not exist, exiting...
+if not defined conda_root (
+    echo ERROR: Set conda_root in paths.ini to initialize conda.
     Pause
-    exit 1
+    exit /b 1
+)
+if not exist "%conda_root%\Scripts\activate.bat" (
+    echo ERROR: Conda activation script not found at "%conda_root%\Scripts\activate.bat".
+    Pause
+    exit /b 1
 )
 
-:: Activate Anaconda
-call %conda_root%/Scripts/activate.bat %conda_root%
+:: Initialize conda without requiring an Anaconda Prompt.
+call "%conda_root%\Scripts\activate.bat" "%conda_root%"
+if errorlevel 1 (
+    echo ERROR: Could not activate the conda base environment for environment creation.
+    Pause
+    exit /b 1
+)
 
 :: Configure package solver
 where mamba >nul 2>nul
@@ -52,7 +68,7 @@ if %mamba_installed%==true (
     set use_mamba=n
 )
 
-if %use_mamba%==y (
+if "!use_mamba!"=="y" (
     set solver=mamba
     echo Using mamba as solver...
 ) else (
@@ -131,7 +147,7 @@ if %installation_type%==normal (
     :: Get python version
     set python_version=
     set /P _python_version="Do you want to install a specific version of Python? (<version>/n): "
-    if !_python_version!==n (
+    if "!_python_version!"=="n" (
         echo No Python version entered, proceeding with latest version...
     ) else if "!_python_version!"=="" (
         echo No Python version entered, proceeding with latest version...
@@ -152,10 +168,9 @@ if %installation_type%==normal (
     echo.
     echo Development environment "!env_name!" has been created successfully!
     echo.
-    echo To complete the installation, please activate the environment and run the installation script:
+    echo To complete the installation, run the installation script:
     echo.
-    echo   conda activate !env_name!
-    echo   install_mne_dev_win.bat
+    echo   install_mne_dev.bat !env_name!
     echo.
 )
 

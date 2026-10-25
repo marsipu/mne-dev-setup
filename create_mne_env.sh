@@ -1,6 +1,5 @@
 #!/bin/bash
 # This script creates a mne-environment
-# It has to be run with 'bash -i create_mne_env.sh' to source .bashrc
 
 # You need to specify the path to your conda-root in a paths.ini file, like this:
 # conda_root=C:\Users\user\Anaconda3
@@ -9,22 +8,36 @@
 # mne_python_path=C:\Users\user\Code\mne-python
 # mne_qt_browser_path=C:\Users\user\Code\mne-qt-browser
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Read version
-source ./version.txt
+if ! source "$script_dir/version.txt"; then
+    echo "ERROR: Could not load version.txt beside this script."
+    exit 1
+fi
 echo Running mne-python installation script $version for MacOs/Linux...
 
 # Read paths from paths.ini
-if [ ! -f paths.ini ]; then
+if [ ! -f "$script_dir/paths.ini" ]; then
     echo "paths.ini not found. Please create paths.ini with the required paths. You can copy template-paths.ini for reference."
     exit 1
 fi
-source ./paths.ini
+if ! source "$script_dir/paths.ini"; then
+    echo "ERROR: Could not load paths.ini."
+    exit 1
+fi
 echo Conda-Root: $conda_root
 
-# Check if conda path exists
-if [ ! -d "$conda_root" ]
-then
-    echo "Path $conda_root does not exist, exiting..."
+if [[ -z "$conda_root" || ! -f "$conda_root/etc/profile.d/conda.sh" ]]; then
+    echo "ERROR: Set conda_root in paths.ini to a conda installation containing etc/profile.d/conda.sh."
+    exit 1
+fi
+if ! source "$conda_root/etc/profile.d/conda.sh"; then
+    echo "ERROR: Could not initialize conda."
+    exit 1
+fi
+if ! conda activate base; then
+    echo "ERROR: Could not activate the conda base environment for environment creation."
     exit 1
 fi
 
@@ -130,9 +143,8 @@ else
     echo
     echo "Development environment \"$env_name\" has been created successfully!"
     echo
-    echo "To complete the installation, please activate the environment and run the installation script:"
+    echo "To complete the installation, run the installation script:"
     echo
-    echo "  conda activate $env_name"
-    echo "  ./install_mne_dev.sh"
+    echo "  bash \"$script_dir/install_mne_dev.sh\" \"$env_name\""
     echo
 fi
