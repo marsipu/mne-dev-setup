@@ -189,7 +189,7 @@ if not defined mne_nodes_path (
 ) else (
     echo Installing development version of mne-nodes...
     cd /d "!mne_nodes_path!"
-    "%env_python%" -m pip install -e .[test,docs,plugins]
+    "%env_python%" -m pip install -e .[test,docs]
     "%env_python%" -m pre_commit install
 )
 
